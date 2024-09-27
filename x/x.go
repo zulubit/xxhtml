@@ -68,9 +68,7 @@ func (e Elem) resolve() El {
 			}
 		}
 
-		buf.WriteString("</")
-		buf.WriteString(*e.value)
-		buf.WriteString(">")
+		buf.WriteString("</" + *e.value + ">")
 
 	case 2: // Class element
 		buf.WriteString(`class="`)

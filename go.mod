@@ -1,9 +1,10 @@
-module github.com/6oof/xxhtml
+module github.com/zulubit/xxhtml
 
 go 1.22.0
 
 require (
 	github.com/charmbracelet/huh v0.5.3
+	github.com/charmbracelet/lipgloss v0.13.0
 	golang.org/x/net v0.28.0
 )
 
@@ -13,7 +14,6 @@ require (
 	github.com/catppuccin/go v0.2.0 // indirect
 	github.com/charmbracelet/bubbles v0.19.0 // indirect
 	github.com/charmbracelet/bubbletea v1.0.0 // indirect
-	github.com/charmbracelet/lipgloss v0.13.0 // indirect
 	github.com/charmbracelet/x/ansi v0.2.2 // indirect
 	github.com/charmbracelet/x/exp/strings v0.0.0-20240722160745-212f7b056ed0 // indirect
 	github.com/charmbracelet/x/term v0.2.0 // indirect

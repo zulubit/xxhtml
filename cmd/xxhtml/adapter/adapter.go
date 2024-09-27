@@ -1,10 +1,7 @@
 package adapter
 
 import (
-	"bufio"
-	"flag"
 	"fmt"
-	"os"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -164,53 +161,4 @@ func ParseFragment(htmlContent string) ([]*html.Node, error) {
 		return nil, fmt.Errorf("error parsing HTML fragment: %w", err)
 	}
 	return doc, nil
-}
-
-func initCli() {
-	// Define the --full flag
-	fullFlag := flag.Bool("full", false, "Parse the entire HTML document")
-	flag.Parse()
-
-	// Read HTML input
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Enter your HTML:")
-	htmlContent, _ := reader.ReadString('\n')
-
-	// Determine the parse mode based on the flag
-	var nodes []string
-
-	if *fullFlag {
-		doc, parseErr := ParseFull(htmlContent)
-		if parseErr != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", parseErr)
-			return
-		}
-		// fmt.Println("Node structure for full document:")
-		// PrintNode(doc, 0)
-		// Convert the entire document, treat it as a root node
-		nodes = []string{ConvertNode(doc)}
-	} else {
-		doc, parseErr := ParseFragment(htmlContent)
-		if parseErr != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", parseErr)
-			return
-		}
-		// Convert each fragment node
-		for _, node := range doc {
-			nodes = append(nodes, ConvertNode(node))
-		}
-	}
-
-	// Convert the HTML content to custom syntax
-	var result strings.Builder
-	for _, node := range nodes {
-		result.WriteString(node)
-	}
-	s := result.String()
-	fmt.Println("\033[31mGenerated Go code:\033[0m")
-	// Remove trailing comma for proper syntax
-	if len(s) > 0 && s[len(s)-1] == ',' {
-		s = s[:len(s)-1]
-	}
-	fmt.Println(s)
 }

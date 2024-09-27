@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/6oof/xxhtml/cmd/xxhtml/adapter"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/zulubit/xxhtml/cmd/xxhtml/adapter"
 )
 
 // Define Lipgloss styles

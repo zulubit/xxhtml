@@ -4,7 +4,7 @@
 **Module** 
 
 ```
-github.com/6oof/xxhtml/x
+github.com/zulubit/xxhtml/x
 ```
 
 The `x` package provides a flexible way to build HTML elements programmatically in Go. It enables creating various HTML tags, setting attributes, nesting elements, and rendering HTML as byte slices.
@@ -16,7 +16,7 @@ package main
 
 import (
     "fmt"
-    "github.com/6oof/xxhtml/x"
+    "github.com/zulubit/xxhtml/x"
 )
 
 func main() {

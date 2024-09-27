@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	xxhtmlcli "github.com/6oof/xxhtml/cmd/xxhtml/cli"
+	xxhtmlcli "github.com/zulubit/xxhtml/cmd/xxhtml/cli"
 )
 
 func main() {
