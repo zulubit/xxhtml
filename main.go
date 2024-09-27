@@ -1,136 +1,68 @@
-package xx
+package main
 
-// Elem represents an HTML element with attributes, text, and children.
-type Elem struct {
-	element    string
-	attributes string
-	children   []Elem
-	text       string
-}
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
 
-// Render generates the HTML representation of the element and its children as a byte slice.
-//
-// Example usage:
-//
-//	elem := xx.E("div", `class="container"`, "Hello, World!")
-//	response := elem.Render()
-//	fmt.Println(string(response)) // Outputs: <div class="container">Hello, World!</div>
-func (tr Elem) Render() []byte {
-	return []byte(tr.resolve())
-}
+	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
+)
 
-// resolve constructs the HTML string for the element and recursively for its children.
-func (tr Elem) resolve() string {
-	if tr.element == "" {
-		// If the element is raw text, return it directly along with any children.
-		chiraw := ""
-		for _, c := range tr.children {
-			chiraw += c.resolve()
+func ConvertNode(n *html.Node) string {
+	if n.Type == html.TextNode {
+		text := strings.TrimSpace(n.Data)
+		if text == "" {
+			// If the text is empty after trimming, return an empty string
+			return ""
 		}
-		return tr.text + chiraw
-	}
-	elp1 := ""
-	if tr.attributes != "" {
-		// Construct the opening tag with attributes and text content.
-		elp1 = "<" + tr.element + " " + tr.attributes + ">" + tr.text
-	} else {
-
-		elp1 = "<" + tr.element + ">" + tr.text
+		return fmt.Sprintf("`%s`", strings.TrimSpace(n.Data))
 	}
 
-	// Recursively resolve children elements.
-	che := ""
-	for _, c := range tr.children {
-		che += c.resolve()
+	// Handle the element and its attributes
+	var attrs string
+	for _, attr := range n.Attr {
+		attrs += fmt.Sprintf(`%s="%s" `, attr.Key, attr.Val)
+	}
+	attrs = strings.TrimSpace(attrs)
+
+	var children []string
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		// Handle both text nodes and element nodes
+		child := strings.TrimSpace(ConvertNode(c))
+		if child != "" {
+			children = append(children, child)
+		}
 	}
 
-	// Construct the closing tag.
-	elp2 := "</" + tr.element + ">"
-
-	return elp1 + che + elp2
+	// Construct the Go code for this element
+	element := fmt.Sprintf(`xx.E("%s", %s, %s)`, n.Data, fmt.Sprintf("`%s`", attrs), strings.Join(children, ", "))
+	return element
 }
 
-// E initializes a new Elem with the specified tag name, attributes, text content, and children elements.
-//
-// Example usage:
-//
-//	div := xx.E("div", `class="container"`, "Hello, World!")
-//	fmt.Println(div.resolve()) // Outputs: <div class="container">Hello, World!</div>
-func E(name string, attributes string, value string, children ...Elem) Elem {
-	return Elem{element: name, text: value, attributes: attributes, children: children}
-}
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("Enter your HTML:")
+	htmlContent, _ := reader.ReadString('\n')
 
-// ERAW creates a raw HTML element, often used for inserting raw HTML content or plain text.
-//
-// Example usage:
-//
-//	raw := xx.ERAW("<h1>Hello, World!</h1>")
-//	fmt.Println(raw.resolve()) // Outputs: <h1>Hello, World!</h1>
-func ERAW(value string) Elem {
-	return Elem{element: "", text: value, attributes: ""}
-}
-
-// IF returns trueCase if the condition is true, otherwise returns an empty Elem.
-//
-// Example usage:
-//
-//	elem := xx.IF(true, xx.E("span", "", "True"))
-//	fmt.Println(elem.resolve()) // Outputs: <span>True</span>
-func IF(condition bool, trueCase Elem) Elem {
-	if condition {
-		return trueCase
+	// Parse the HTML fragment
+	doc, err := html.ParseFragment(strings.NewReader(htmlContent), &html.Node{
+		Type:     html.ElementNode,
+		Data:     "body",
+		DataAtom: atom.Body,
+	})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error parsing HTML fragment: %v\n", err)
+		return
 	}
-	return E("", "", "")
-}
 
-// FOR takes a slice of Elem and returns a parent Elem containing all elements in the slice as its children.
-//
-// Example usage:
-//
-//	elems := xx.FOR([]xx.Elem{
-//	    xx.E("li", "", "Item 1"),
-//	    xx.E("li", "", "Item 2"),
-//	})
-//	fmt.Println(elems.resolve()) // Outputs: <li>Item 1</li><li>Item 2</li>
-func FOR(iterClosure []Elem) Elem {
-	return E("", "", "", iterClosure...)
-}
-
-// TER returns trueCase if the condition is true, otherwise returns falseCase.
-//
-// Example usage:
-//
-//	result := xx.TER(true, xx.E("p", "", "True"), xx.E("p", "", "False"))
-//	fmt.Println(result.resolve()) // Outputs: <p>True</p>
-func TER(condition bool, trueCase Elem, falseCase Elem) Elem {
-	if condition {
-		return trueCase
+	// Convert the HTML fragment to custom syntax
+	var result string
+	for _, node := range doc {
+		result += ConvertNode(node)
 	}
-	return falseCase
-}
 
-// STER returns trueCase if the boolean condition is true, otherwise returns falseCase.
-//
-// Example usage:
-//
-//	result := xx.STER(true, "True", "False")
-//	fmt.Println(result) // Outputs: True
-func STER(condition bool, trueCase string, falseCase string) string {
-	if condition {
-		return trueCase
-	}
-	return falseCase
-}
-
-// SIF returns trueCase if the boolean condition is true, otherwise returns an empty string.
-//
-// Example usage:
-//
-//	result := xx.SIF(true, "True")
-//	fmt.Println(result) // Outputs: True
-func SIF(condition bool, trueCase string) string {
-	if condition {
-		return trueCase
-	}
-	return ""
+	fmt.Println("Generated Go code:")
+	fmt.Println(result)
 }

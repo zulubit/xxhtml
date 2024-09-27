@@ -16,7 +16,7 @@ package main
 import (
     "net/http"
     "strconv"
-    "github.com/6oof/xxhtml"
+    "github.com/6oof/xxhtml/xx"
 )
 
 func main() {
