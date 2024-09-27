@@ -25,17 +25,20 @@ func main() {
 }
 ```
 
-
 ### Key Types
 
 - **`Elem`**: Represents an HTML element with attributes, text, and children.
-- **`X`**: Represents attributes like class, id, and other HTML attributes.
 
 ### Key Functions
 
 - **`E(name string, attributes string, children ...Elem) Elem`**: Creates a new `Elem` with the specified tag name, attributes, and optional children.
 - **`ERAW(value string) Elem`**: Creates an `Elem` with raw HTML content or plain text.
-- **`C(content string) Elem`**: Creates an `Elem` with content that is automatically escaped for safe HTML output.
+- **`C(content interface{}) Elem`**: Creates an `Elem` with content that is automatically escaped for safe HTML output.
+- **`CR(content interface{}) Elem`**: Creates an `Elem` with content that is not escaped, for unescaped HTML output.
+
+### Methods
+
+- **`SC()`**: Marks the `Elem` as self-closing. This method is typically used for HTML elements that do not have closing tags (e.g., `<img>`, `<input>`). 
 
 ### Control Structures
 
@@ -49,48 +52,16 @@ func main() {
 
 #### Non-Self-Closing Elements
 
-- **`Div(attributes string, children ...Elem) Elem`**: Creates a `<div>` element.
-- **`Span(attributes string, children ...Elem) Elem`**: Creates a `<span>` element.
-- **`P(attributes string, children ...Elem) Elem`**: Creates a `<p>` element.
-- **`A(attributes string, children ...Elem) Elem`**: Creates an `<a>` element.
-- **`H1(attributes string, children ...Elem) Elem`**: Creates an `<h1>` element.
-- **`H2(attributes string, children ...Elem) Elem`**: Creates an `<h2>` element.
-- **`H3(attributes string, children ...Elem) Elem`**: Creates an `<h3>` element.
-- **`Ul(attributes string, children ...Elem) Elem`**: Creates a `<ul>` element.
-- **`Ol(attributes string, children ...Elem) Elem`**: Creates an `<ol>` element.
-- **`Li(attributes string) Elem`**: Creates a `<li>` element.
-- **`Table(attributes string, children ...Elem) Elem`**: Creates a `<table>` element.
-- **`Tr(attributes string, children ...Elem) Elem`**: Creates a `<tr>` element.
-- **`Td(attributes string) Elem`**: Creates a `<td>` element.
-- **`Th(attributes string) Elem`**: Creates a `<th>` element.
-- **`Form(attributes string, children ...Elem) Elem`**: Creates a `<form>` element.
-- **`Button(attributes string, children ...Elem) Elem`**: Creates a `<button>` element.
-- **`Label(attributes string, children ...Elem) Elem`**: Creates a `<label>` element.
-- **`Article(attributes string, children ...Elem) Elem`**: Creates an `<article>` element.
-- **`Aside(attributes string, children ...Elem) Elem`**: Creates an `<aside>` element.
-- **`Header(attributes string, children ...Elem) Elem`**: Creates a `<header>` element.
-- **`Footer(attributes string, children ...Elem) Elem`**: Creates a `<footer>` element.
-- **`Main(attributes string, children ...Elem) Elem`**: Creates a `<main>` element.
-- **`Section(attributes string, children ...Elem) Elem`**: Creates a `<section>` element.
-- **`Nav(attributes string, children ...Elem) Elem`**: Creates a `<nav>` element.
-- **`Figure(attributes string, children ...Elem) Elem`**: Creates a `<figure>` element.
-- **`Figcaption(attributes string, children ...Elem) Elem`**: Creates a `<figcaption>` element.
-- **`Datalist(attributes string, children ...Elem) Elem`**: Creates a `<datalist>` element.
-- **`Option(attributes string) Elem`**: Creates an `<option>` element.
-- **`Details(attributes string, children ...Elem) Elem`**: Creates a `<details>` element.
-- **`Summary(attributes string, children ...Elem) Elem`**: Creates a `<summary>` element.
-- **`Dialog(attributes string, children ...Elem) Elem`**: Creates a `<dialog>` element.
-- **`Map(attributes string, children ...Elem) Elem`**: Creates a `<map>` element.
+Convenience functions are provided for various non-self-closing HTML elements, including: `Div`, `Span`, `P`, `A`, `H1`, `H2`, `H3`, `Ul`, `Ol`, `Li`, `Table`, `Tr`, `Td`, `Th`, `Form`, `Button`, `Label`, `Article`, `Aside`, `Header`, `Footer`, `Main`, `Section`, `Nav`, `Figure`, `Figcaption`, `Datalist`, `Details`, `Summary`, `Dialog`, `Map`, `Html`, `Head`, and `Body`.
 
 #### Self-Closing Elements
 
-- **`Img(attributes string) Elem`**: Creates a self-closing `<img>` element.
-- **`Input(attributes string) Elem`**: Creates a self-closing `<input>` element.
-- **`Embed(attributes string) Elem`**: Creates a self-closing `<embed>` element.
-- **`Area(attributes string) Elem`**: Creates a self-closing `<area>` element.
-- **`Source(attributes string) Elem`**: Creates a self-closing `<source>` element.
-- **`Track(attributes string) Elem`**: Creates a self-closing `<track>` element.
-- **`Param(attributes string) Elem`**: Creates a self-closing `<param>` element.
-- **`Meta(attributes string) Elem`**: Creates a self-closing `<meta>` element.
-- **`Link(attributes string) Elem`**: Creates a self-closing `<link>` element.
-- **`Base(attributes string) Elem`**: Creates a self-closing `<base>` element.
+Convenience functions are provided for self-closing HTML elements, including: `Img`, `Input`, `Embed`, `Area`, `Source`, `Track`, `Param`, `Meta`, `Link`, and `Base`.
+
+### Notes
+
+- **Self-Closing Tags**: Elements that are self-closing in HTML (like `<img>`, `<input>`, etc.) should have the `selfClosing` attribute set to `true`.
+- **Non-Self-Closing Tags**: Most other HTML elements will require a closing tag and can include children elements.
+
+Feel free to explore and use these functions to create HTML structures programmatically in your Go applications.
+`Base(attributes string) Elem`**: ibutes string) Elem`**: Creates a self-closing `<base>` element.

@@ -22,7 +22,7 @@ func A(attributes string, children ...Elem) Elem {
 	return E("a", attributes, children...)
 }
 
-// Img creates a new <img> (image) element.
+// Img creates a new <img> (image) element. This is a self-closing tag.
 func Img(attributes string) Elem {
 	elem := E("img", attributes)
 	elem.selfClosing = true
@@ -54,7 +54,7 @@ func Ol(attributes string, children ...Elem) Elem {
 	return E("ol", attributes, children...)
 }
 
-// Li creates a new <li> (list item) element.
+// Li creates a new <li> (list item) element with optional children.
 func Li(attributes string, children ...Elem) Elem {
 	return E("li", attributes, children...)
 }
@@ -69,12 +69,12 @@ func Tr(attributes string, children ...Elem) Elem {
 	return E("tr", attributes, children...)
 }
 
-// Td creates a new <td> (table cell) element.
+// Td creates a new <td> (table cell) element with optional children.
 func Td(attributes string, children ...Elem) Elem {
 	return E("td", attributes, children...)
 }
 
-// Th creates a new <th> (table header cell) element.
+// Th creates a new <th> (table header cell) element with optional children.
 func Th(attributes string, children ...Elem) Elem {
 	return E("th", attributes, children...)
 }
@@ -84,7 +84,7 @@ func Form(attributes string, children ...Elem) Elem {
 	return E("form", attributes, children...)
 }
 
-// Input creates a new <input> element.
+// Input creates a new <input> element. This is a self-closing tag.
 func Input(attributes string) Elem {
 	elem := E("input", attributes)
 	elem.selfClosing = true
@@ -151,9 +151,11 @@ func Datalist(attributes string, children ...Elem) Elem {
 	return E("datalist", attributes, children...)
 }
 
-// Option creates a new <option> element.
+// Option creates a new <option> element. This is a self-closing tag.
 func Option(attributes string) Elem {
-	return E("option", attributes)
+	elem := E("option", attributes)
+	elem.selfClosing = true
+	return elem
 }
 
 // Details creates a new <details> element with optional children.
@@ -171,7 +173,7 @@ func Dialog(attributes string, children ...Elem) Elem {
 	return E("dialog", attributes, children...)
 }
 
-// Embed creates a new <embed> element with optional attributes.
+// Embed creates a new <embed> element. This is a self-closing tag.
 func Embed(attributes string) Elem {
 	elem := E("embed", attributes)
 	elem.selfClosing = true
@@ -183,37 +185,37 @@ func Map(attributes string, children ...Elem) Elem {
 	return E("map", attributes, children...)
 }
 
-// Area creates a new <area> element with optional attributes.
+// Area creates a new <area> element. This is a self-closing tag.
 func Area(attributes string) Elem {
 	elem := E("area", attributes)
 	elem.selfClosing = true
 	return elem
 }
 
-// Source creates a new <source> element with optional attributes.
+// Source creates a new <source> element. This is a self-closing tag.
 func Source(attributes string) Elem {
 	elem := E("source", attributes)
 	elem.selfClosing = true
 	return elem
 }
 
-// Track creates a new <track> element with optional attributes.
+// Track creates a new <track> element. This is a self-closing tag.
 func Track(attributes string) Elem {
 	elem := E("track", attributes)
 	elem.selfClosing = true
 	return elem
 }
 
-// Param creates a new <param> element with optional attributes.
+// Param creates a new <param> element. This is a self-closing tag.
 func Param(attributes string) Elem {
 	elem := E("param", attributes)
 	elem.selfClosing = true
 	return elem
 }
 
-// Script creates a new <script> element with optional attributes.
-func Script(attributes string) Elem {
-	return E("script", attributes)
+// Script creates a new <script> element with optional children.
+func Script(attributes string, children ...Elem) Elem {
+	return E("script", attributes, children...)
 }
 
 // Style creates a new <style> element with optional children.
@@ -221,14 +223,14 @@ func Style(attributes string, children ...Elem) Elem {
 	return E("style", attributes, children...)
 }
 
-// Meta creates a new <meta> element with optional attributes.
+// Meta creates a new <meta> element. This is a self-closing tag.
 func Meta(attributes string) Elem {
 	elem := E("meta", attributes)
 	elem.selfClosing = true
 	return elem
 }
 
-// Link creates a new <link> element with optional attributes.
+// Link creates a new <link> element. This is a self-closing tag.
 func Link(attributes string) Elem {
 	elem := E("link", attributes)
 	elem.selfClosing = true
@@ -240,7 +242,7 @@ func Title(attributes string, children ...Elem) Elem {
 	return E("title", attributes, children...)
 }
 
-// Base creates a new <base> element with optional attributes.
+// Base creates a new <base> element. This is a self-closing tag.
 func Base(attributes string) Elem {
 	elem := E("base", attributes)
 	elem.selfClosing = true
