@@ -1,7 +1,11 @@
 # XXHTML
 ## `x` Package Documentation
 
-**Module:** [github.com/6oof/xxhtml/x](https://github.com/6oof/xxhtml/x)
+**Module** 
+
+```
+github.com/6oof/xxhtml/x
+```
 
 The `x` package provides a flexible way to build HTML elements programmatically in Go. It enables creating various HTML tags, setting attributes, nesting elements, and rendering HTML as byte slices.
 
