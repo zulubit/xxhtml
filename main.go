@@ -53,7 +53,7 @@ func ConvertNode(n *html.Node) string {
 
 	// Add children to the element with line breaks
 	if len(children) > 0 {
-		elem += ".C(\n" + strings.Join(children, ",\n") + "\n)"
+		elem += ".C(\n" + strings.Join(children, ",\n") + ",\n)"
 	}
 
 	return elem
