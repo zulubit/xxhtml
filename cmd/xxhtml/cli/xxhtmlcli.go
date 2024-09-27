@@ -1,64 +1,21 @@
 package xxhtmlcli
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/6oof/xxhtml/cmd/xxhtml/adapter"
-	"github.com/charmbracelet/bubbles/textarea"
-	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/lipgloss"
 )
 
-type model struct {
-	input      textarea.Model
-	generated  string
-	fullFlag   bool
-	errMessage string
-}
-
-func initialModel() model {
-	ta := textarea.New()
-	ta.Placeholder = "Paste your HTML here..."
-	ta.Focus()
-	ta.SetWidth(80)
-	ta.SetHeight(20) // Set height to accommodate more lines of input
-	return model{
-		input: ta,
-	}
-}
-
-func (m model) Init() tea.Cmd {
-	return textarea.Blink
-}
-
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "q":
-			return m, tea.Quit
-		case "enter":
-			if m.input.Value() != "" {
-				m.generated = processHTML(m.input.Value(), m.fullFlag)
-			} else {
-				m.errMessage = "No HTML provided!"
-			}
-		}
-	}
-	var cmd tea.Cmd
-	m.input, cmd = m.input.Update(msg)
-	return m, cmd
-}
-
-func (m model) View() string {
-	if m.generated != "" {
-		return fmt.Sprintf("\033[31mGenerated Go code:\033[0m\n%s\nPress q to exit.", m.generated)
-	} else if m.errMessage != "" {
-		return fmt.Sprintf("\033[31mError:\033[0m %s\n%s", m.errMessage, m.input.View())
-	} else {
-		return fmt.Sprintf("Paste your HTML and press Enter to generate Go code:\n%s", m.input.View())
-	}
-}
+// Define Lipgloss styles
+var (
+	styleGeneratedTitle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#a3be8c")) // Style for the title
+	styleCode           = lipgloss.NewStyle().Foreground(lipgloss.Color("#ebdbb2"))            // Style for the code
+	styleError          = lipgloss.NewStyle().Foreground(lipgloss.Color("#ff6c6b"))            // Style for errors
+)
 
 func processHTML(htmlContent string, fullFlag bool) string {
 	var nodes []string
@@ -92,9 +49,41 @@ func processHTML(htmlContent string, fullFlag bool) string {
 }
 
 func Run() error {
-	p := tea.NewProgram(initialModel())
-	if _, err := p.Run(); err != nil {
-		return fmt.Errorf("Error starting xxhtml program: %w", err)
+	var htmlInput string
+	var fullFlag bool
+
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewText().
+				Title("Paste your HTML here:").
+				Description("Char limit of 100,000").
+				Validate(func(str string) error {
+					if str == "" {
+						return errors.New("Can't be left empty.")
+					}
+					return nil
+				}).
+				Value(&htmlInput).
+				CharLimit(100000),
+			huh.NewConfirm().
+				Title("Full HTML document?").
+				Value(&fullFlag),
+		),
+	).WithTheme(huh.ThemeCatppuccin())
+
+	// Display the form and handle user input
+	err := form.Run()
+	if err != nil {
+		return fmt.Errorf("Error displaying form: %w", err)
 	}
+
+	if htmlInput == "" {
+		return fmt.Errorf(styleError.Render("No HTML provided!"))
+	}
+
+	generatedCode := processHTML(htmlInput, fullFlag)
+	fmt.Println(styleGeneratedTitle.Render("Generated Go code:"))
+	fmt.Println(styleCode.Render(generatedCode))
+
 	return nil
 }
