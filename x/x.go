@@ -12,9 +12,9 @@ type Elem struct {
 
 // X represents the properties of an element like value, class, id, and additional attributes.
 type X struct {
-	class string
-	id    string
-	att   string
+	Class string
+	Id    string
+	Att   string
 }
 
 // Render generates the HTML representation of the element and its children as a byte slice.
@@ -44,14 +44,14 @@ func (tr Elem) resolve() string {
 
 	// Add attributes from `X` struct if present.
 	if tr.tag != nil {
-		if tr.tag.class != "" {
-			elp1 += " class=\"" + tr.tag.class + "\""
+		if tr.tag.Class != "" {
+			elp1 += " class=\"" + tr.tag.Class + "\""
 		}
-		if tr.tag.id != "" {
-			elp1 += " id=\"" + tr.tag.id + "\""
+		if tr.tag.Id != "" {
+			elp1 += " id=\"" + tr.tag.Id + "\""
 		}
-		if tr.tag.att != "" {
-			elp1 += " " + tr.tag.att
+		if tr.tag.Att != "" {
+			elp1 += " " + tr.tag.Att
 		}
 	}
 
@@ -365,4 +365,264 @@ func Button(x X, children ...Elem) Elem {
 //	fmt.Println(label.resolve()) // Outputs: <label for="inputID">Label text</label>
 func Label(x X, children ...Elem) Elem {
 	return E("label", x, children...)
+}
+
+// Article creates a new <article> element with optional children.
+//
+// Example usage:
+//
+//	article := xx.Article(xx.X{value: "Article content"}, xx.Section(xx.X{value: "Section"}))
+//	fmt.Println(article.resolve()) // Outputs: <article>Article content<section>Section</section></article>
+func Article(x X, children ...Elem) Elem {
+	return E("article", x, children...)
+}
+
+// Aside creates a new <aside> element with optional children.
+//
+// Example usage:
+//
+//	aside := xx.Aside(xx.X{value: "Aside content"})
+//	fmt.Println(aside.resolve()) // Outputs: <aside>Aside content</aside>
+func Aside(x X, children ...Elem) Elem {
+	return E("aside", x, children...)
+}
+
+// Header creates a new <header> element with optional children.
+//
+// Example usage:
+//
+//	header := xx.Header(xx.X{value: "Header content"}, xx.Nav(xx.X{value: "Navigation"}))
+//	fmt.Println(header.resolve()) // Outputs: <header>Header content<nav>Navigation</nav></header>
+func Header(x X, children ...Elem) Elem {
+	return E("header", x, children...)
+}
+
+// Footer creates a new <footer> element with optional children.
+//
+// Example usage:
+//
+//	footer := xx.Footer(xx.X{value: "Footer content"})
+//	fmt.Println(footer.resolve()) // Outputs: <footer>Footer content</footer>
+func Footer(x X, children ...Elem) Elem {
+	return E("footer", x, children...)
+}
+
+// Main creates a new <main> element with optional children.
+//
+// Example usage:
+//
+//	main := xx.Main(xx.X{value: "Main content"})
+//	fmt.Println(main.resolve()) // Outputs: <main>Main content</main>
+func Main(x X, children ...Elem) Elem {
+	return E("main", x, children...)
+}
+
+// Section creates a new <section> element with optional children.
+//
+// Example usage:
+//
+//	section := xx.Section(xx.X{value: "Section content"})
+//	fmt.Println(section.resolve()) // Outputs: <section>Section content</section>
+func Section(x X, children ...Elem) Elem {
+	return E("section", x, children...)
+}
+
+// Nav creates a new <nav> element with optional children.
+//
+// Example usage:
+//
+//	nav := xx.Nav(xx.X{value: "Navigation links"})
+//	fmt.Println(nav.resolve()) // Outputs: <nav>Navigation links</nav>
+func Nav(x X, children ...Elem) Elem {
+	return E("nav", x, children...)
+}
+
+// Figure creates a new <figure> element with optional children.
+//
+// Example usage:
+//
+//	figure := xx.Figure(xx.X{value: "Figure content"}, xx.Figcaption(xx.X{value: "Caption"}))
+//	fmt.Println(figure.resolve()) // Outputs: <figure>Figure content<figcaption>Caption</figcaption></figure>
+func Figure(x X, children ...Elem) Elem {
+	return E("figure", x, children...)
+}
+
+// Figcaption creates a new <figcaption> element with optional children.
+//
+// Example usage:
+//
+//	figcaption := xx.Figcaption(xx.X{value: "Caption text"})
+//	fmt.Println(figcaption.resolve()) // Outputs: <figcaption>Caption text</figcaption>
+func Figcaption(x X, children ...Elem) Elem {
+	return E("figcaption", x, children...)
+}
+
+// Datalist creates a new <datalist> element with optional children.
+//
+// Example usage:
+//
+//	datalist := xx.Datalist(xx.Option(xx.X{value: "Option 1"}), xx.Option(xx.X{value: "Option 2"}))
+//	fmt.Println(datalist.resolve()) // Outputs: <datalist><option>Option 1</option><option>Option 2</option></datalist>
+func Datalist(x X, children ...Elem) Elem {
+	return E("datalist", x, children...)
+}
+
+// Option creates a new <option> element with optional children.
+//
+// Example usage:
+//
+//	option := xx.Option(xx.X{value: "Option text"})
+//	fmt.Println(option.resolve()) // Outputs: <option>Option text</option>
+func Option(x X) Elem {
+	return E("option", x)
+}
+
+// Details creates a new <details> element with optional children.
+//
+// Example usage:
+//
+//	details := xx.Details(xx.X{value: "Details content"}, xx.Summary(xx.X{value: "Summary"}))
+//	fmt.Println(details.resolve()) // Outputs: <details>Details content<summary>Summary</summary></details>
+func Details(x X, children ...Elem) Elem {
+	return E("details", x, children...)
+}
+
+// Summary creates a new <summary> element with optional children.
+//
+// Example usage:
+//
+//	summary := xx.Summary(xx.X{value: "Summary text"})
+//	fmt.Println(summary.resolve()) // Outputs: <summary>Summary text</summary>
+func Summary(x X, children ...Elem) Elem {
+	return E("summary", x, children...)
+}
+
+// Dialog creates a new <dialog> element with optional children.
+//
+// Example usage:
+//
+//	dialog := xx.Dialog(xx.X{value: "Dialog content"})
+//	fmt.Println(dialog.resolve()) // Outputs: <dialog>Dialog content</dialog>
+func Dialog(x X, children ...Elem) Elem {
+	return E("dialog", x, children...)
+}
+
+// Embed creates a new <embed> element with optional attributes.
+//
+// Example usage:
+//
+//	embed := xx.Embed(xx.X{att: `src="video.mp4" type="video/mp4"`})
+//	fmt.Println(embed.resolve()) // Outputs: <embed src="video.mp4" type="video/mp4">
+func Embed(x X) Elem {
+	return E("embed", x)
+}
+
+// Map creates a new <map> element with optional children.
+//
+// Example usage:
+//
+//	mapElem := xx.Map(xx.X{value: "Map content"}, xx.Area(xx.X{att: `shape="rect" coords="34,44,270,350" href="https://example.com"`, value: "Area"}))
+//	fmt.Println(mapElem.resolve()) // Outputs: <map>Map content<area shape="rect" coords="34,44,270,350" href="https://example.com">Area</area></map>
+func Map(x X, children ...Elem) Elem {
+	return E("map", x, children...)
+}
+
+// Area creates a new <area> element with optional attributes.
+//
+// Example usage:
+//
+//	area := xx.Area(xx.X{att: `shape="rect" coords="34,44,270,350" href="https://example.com"`, value: "Area"})
+//	fmt.Println(area.resolve()) // Outputs: <area shape="rect" coords="34,44,270,350" href="https://example.com">Area</area>
+func Area(x X) Elem {
+	return E("area", x)
+}
+
+// Source creates a new <source> element with optional attributes.
+//
+// Example usage:
+//
+//	source := xx.Source(xx.X{att: `src="audio.mp3" type="audio/mp3"`})
+//	fmt.Println(source.resolve()) // Outputs: <source src="audio.mp3" type="audio/mp3">
+func Source(x X) Elem {
+	return E("source", x)
+}
+
+// Track creates a new <track> element with optional attributes.
+//
+// Example usage:
+//
+//	track := xx.Track(xx.X{att: `src="captions.vtt" kind="subtitles" srclang="en" label="English"`})
+//	fmt.Println(track.resolve()) // Outputs: <track src="captions.vtt" kind="subtitles" srclang="en" label="English">
+func Track(x X) Elem {
+	return E("track", x)
+}
+
+// Param creates a new <param> element with optional attributes.
+//
+// Example usage:
+//
+//	param := xx.Param(xx.X{att: `name="autoplay" value="true"`})
+//	fmt.Println(param.resolve()) // Outputs: <param name="autoplay" value="true">
+func Param(x X) Elem {
+	return E("param", x)
+}
+
+// Script creates a new <script> element with optional attributes.
+//
+// Example usage:
+//
+//	script := xx.Script(xx.X{att: `src="script.js"`})
+//	fmt.Println(script.resolve()) // Outputs: <script src="script.js"></script>
+func Script(x X) Elem {
+	return E("script", x)
+}
+
+// Style creates a new <style> element with optional children.
+//
+// Example usage:
+//
+//	style := xx.Style(xx.X{}, xx.ERAW("body { background: #f00; }"))
+//	fmt.Println(style.resolve()) // Outputs: <style>body { background: #f00; }</style>
+func Style(x X, children ...Elem) Elem {
+	return E("style", x, children...)
+}
+
+// Meta creates a new <meta> element with optional attributes.
+//
+// Example usage:
+//
+//	meta := xx.Meta(xx.X{att: `name="viewport" content="width=device-width, initial-scale=1"`})
+//	fmt.Println(meta.resolve()) // Outputs: <meta name="viewport" content="width=device-width, initial-scale=1">
+func Meta(x X) Elem {
+	return E("meta", x)
+}
+
+// Link creates a new <link> element with optional attributes.
+//
+// Example usage:
+//
+//	link := xx.Link(xx.X{att: `rel="stylesheet" href="styles.css"`})
+//	fmt.Println(link.resolve()) // Outputs: <link rel="stylesheet" href="styles.css">
+func Link(x X) Elem {
+	return E("link", x)
+}
+
+// Title creates a new <title> element with optional children.
+//
+// Example usage:
+//
+//	title := xx.Title(xx.X{value: "Page Title"})
+//	fmt.Println(title.resolve()) // Outputs: <title>Page Title</title>
+func Title(x X, children ...Elem) Elem {
+	return E("title", x, children...)
+}
+
+// Base creates a new <base> element with optional attributes.
+//
+// Example usage:
+//
+//	base := xx.Base(xx.X{att: `href="https://example.com/"`})
+//	fmt.Println(base.resolve()) // Outputs: <base href="https://example.com/">
+func Base(x X) Elem {
+	return E("base", x)
 }

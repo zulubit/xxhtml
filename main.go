@@ -12,25 +12,51 @@ import (
 
 // map of HTML tag names to corresponding x convenience functions
 var tagToFunc = map[string]string{
-	"div":    "x.Div",
-	"span":   "x.Span",
-	"p":      "x.P",
-	"a":      "x.A",
-	"img":    "x.Img",
-	"h1":     "x.H1",
-	"h2":     "x.H2",
-	"h3":     "x.H3",
-	"ul":     "x.Ul",
-	"ol":     "x.Ol",
-	"li":     "x.Li",
-	"table":  "x.Table",
-	"tr":     "x.Tr",
-	"td":     "x.Td",
-	"th":     "x.Th",
-	"form":   "x.Form",
-	"input":  "x.Input",
-	"button": "x.Button",
-	"label":  "x.Label",
+	"div":        "x.Div",
+	"span":       "x.Span",
+	"p":          "x.P",
+	"a":          "x.A",
+	"img":        "x.Img",
+	"h1":         "x.H1",
+	"h2":         "x.H2",
+	"h3":         "x.H3",
+	"ul":         "x.Ul",
+	"ol":         "x.Ol",
+	"li":         "x.Li",
+	"table":      "x.Table",
+	"tr":         "x.Tr",
+	"td":         "x.Td",
+	"th":         "x.Th",
+	"form":       "x.Form",
+	"input":      "x.Input",
+	"button":     "x.Button",
+	"label":      "x.Label",
+	"article":    "x.Article",
+	"aside":      "x.Aside",
+	"header":     "x.Header",
+	"footer":     "x.Footer",
+	"main":       "x.Main",
+	"section":    "x.Section",
+	"nav":        "x.Nav",
+	"figure":     "x.Figure",
+	"figcaption": "x.Figcaption",
+	"datalist":   "x.Datalist",
+	"option":     "x.Option",
+	"details":    "x.Details",
+	"summary":    "x.Summary",
+	"dialog":     "x.Dialog",
+	"embed":      "x.Embed",
+	"map":        "x.Map",
+	"area":       "x.Area",
+	"source":     "x.Source",
+	"track":      "x.Track",
+	"param":      "x.Param",
+	"script":     "x.Script",
+	"style":      "x.Style",
+	"meta":       "x.Meta",
+	"link":       "x.Link",
+	"title":      "x.Title",
+	"base":       "x.Base",
 }
 
 // ConvertNode converts an HTML node into a custom Go syntax using the x package.
@@ -59,11 +85,11 @@ func ConvertNode(n *html.Node) string {
 		var attrParts []string
 		for _, attr := range n.Attr {
 			if attr.Key == "class" {
-				attrParts = append(attrParts, fmt.Sprintf("class: `%s`", attr.Val))
+				attrParts = append(attrParts, fmt.Sprintf("Class: `%s`", attr.Val))
 			} else if attr.Key == "id" {
-				attrParts = append(attrParts, fmt.Sprintf("id: `%s`", attr.Val))
+				attrParts = append(attrParts, fmt.Sprintf("Id: `%s`", attr.Val))
 			} else {
-				attrParts = append(attrParts, fmt.Sprintf("att: `%s=\"%s\"`", attr.Key, attr.Val))
+				attrParts = append(attrParts, fmt.Sprintf("Att: `%s=\"%s\"`", attr.Key, attr.Val))
 			}
 		}
 		elem += strings.Join(attrParts, ", ") + "},\n"
