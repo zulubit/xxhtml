@@ -10,80 +10,81 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-// map of HTML tag names to corresponding xx convenience functions
+// map of HTML tag names to corresponding x convenience functions
 var tagToFunc = map[string]string{
-	"div":      "xx.Div()",
-	"span":     "xx.Span()",
-	"p":        "xx.P()",
-	"a":        "xx.A()",
-	"img":      "xx.Img()",
-	"h1":       "xx.H1()",
-	"h2":       "xx.H2()",
-	"h3":       "xx.H3()",
-	"ul":       "xx.Ul()",
-	"ol":       "xx.Ol()",
-	"li":       "xx.Li()",
-	"table":    "xx.Table()",
-	"tr":       "xx.Tr()",
-	"td":       "xx.Td()",
-	"th":       "xx.Th()",
-	"form":     "xx.Form()",
-	"input":    "xx.Input()",
-	"button":   "xx.Button()",
-	"label":    "xx.Label()",
-	"textarea": "xx.Textarea()",
+	"div":    "x.Div",
+	"span":   "x.Span",
+	"p":      "x.P",
+	"a":      "x.A",
+	"img":    "x.Img",
+	"h1":     "x.H1",
+	"h2":     "x.H2",
+	"h3":     "x.H3",
+	"ul":     "x.Ul",
+	"ol":     "x.Ol",
+	"li":     "x.Li",
+	"table":  "x.Table",
+	"tr":     "x.Tr",
+	"td":     "x.Td",
+	"th":     "x.Th",
+	"form":   "x.Form",
+	"input":  "x.Input",
+	"button": "x.Button",
+	"label":  "x.Label",
 }
 
-// ConvertNode converts an HTML node into a custom Go syntax using the xx package.
+// ConvertNode converts an HTML node into a custom Go syntax using the x package.
+
 func ConvertNode(n *html.Node) string {
 	if n.Type == html.TextNode {
 		text := strings.TrimSpace(n.Data)
 		if text == "" {
 			return ""
 		}
-		return fmt.Sprintf("xx.ERAW(`%s`)", text)
+		return fmt.Sprintf("x.C(`%s`),", text)
 	}
 
+	elem := ""
 	// Check if the tag has a corresponding convenience function
 	elemFunc, exists := tagToFunc[n.Data]
 	if !exists {
-		elemFunc = fmt.Sprintf("xx.E(`%s`)", n.Data) // fallback to generic E() function
+		elemFunc = "x.E" // fallback to generic E() function
+		elem = fmt.Sprintf(`%s("%s",x.X{`, elemFunc, n.Data)
+	} else {
+		elem = fmt.Sprintf("%s(x.X{", elemFunc)
 	}
-
-	// Initialize the element with the tag name or the convenience function
-	elem := elemFunc
 
 	// Handle the element's attributes
-	var attrs []string
-	for _, attr := range n.Attr {
-		if attr.Key == "class" {
-			elem += fmt.Sprintf(".CLS(`%s`)", attr.Val)
-		} else {
-			attrs = append(attrs, fmt.Sprintf(`%s="%s"`, attr.Key, attr.Val))
+	if len(n.Attr) > 0 {
+		var attrParts []string
+		for _, attr := range n.Attr {
+			if attr.Key == "class" {
+				attrParts = append(attrParts, fmt.Sprintf("class: `%s`", attr.Val))
+			} else if attr.Key == "id" {
+				attrParts = append(attrParts, fmt.Sprintf("id: `%s`", attr.Val))
+			} else {
+				attrParts = append(attrParts, fmt.Sprintf("att: `%s=\"%s\"`", attr.Key, attr.Val))
+			}
 		}
-	}
-	for _, attr := range attrs {
-		elem += fmt.Sprintf(".ATT(`%s`)", attr)
+		elem += strings.Join(attrParts, ", ") + "},\n"
+	} else {
+		elem += "},\n"
 	}
 
-	// Collect text content and child nodes
-	var content string
+	// Collect child nodes
 	var children []string
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		if c.Type == html.TextNode {
-			content += strings.TrimSpace(c.Data) + " "
-		} else {
-			children = append(children, ConvertNode(c))
+		child := ConvertNode(c)
+		if child != "" { // Avoid appending empty strings
+			children = append(children, child)
 		}
 	}
-	content = strings.TrimSpace(content)
-	if content != "" {
-		elem += fmt.Sprintf(".VAL(`%s`)", content)
-	}
 
-	// Add children to the element with line breaks
+	// Add children to the element
 	if len(children) > 0 {
-		elem += ".C(\n" + strings.Join(children, ",\n") + ",\n)"
+		elem += strings.Join(children, "\n") + "\n),"
+	} else {
+		elem += ")"
 	}
 
 	return elem
@@ -110,7 +111,7 @@ func main() {
 	for _, node := range doc {
 		result.WriteString(ConvertNode(node))
 	}
-
-	fmt.Println("Generated Go code:")
-	fmt.Println(result.String())
+	s := result.String()
+	fmt.Println("\033[31mGenerated Go code:\033[0m")
+	fmt.Println(s[:len(s)-1])
 }
