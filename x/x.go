@@ -17,9 +17,9 @@ Example usage:
 package x
 
 import (
+	"bytes"
 	"fmt"
 	"html"
-	"strings"
 )
 
 // Elem represents an HTML element with attributes, text, and children.
@@ -33,52 +33,59 @@ type Elem struct {
 
 // Render generates the HTML representation of the element and its children as a byte slice.
 func (e Elem) Render() []byte {
-	return []byte(e.resolve())
+	return e.resolve()
 }
 
 // resolve constructs the HTML string for the element and recursively for its children.
-func (e Elem) resolve() string {
-	var sb strings.Builder
+func (e Elem) resolve() []byte {
+	var buf bytes.Buffer
+
+	attributes := e.attributes
+	children := e.children
+	value := e.value
 
 	if e.element == "" {
-		if e.value != nil {
-			sb.WriteString(*e.value)
+		if value != nil {
+			buf.WriteString(*value)
 		}
-		if e.children != nil {
-			for _, c := range *e.children {
-				sb.WriteString(c.resolve())
+		if children != nil {
+			for _, c := range *children {
+				buf.Write(c.resolve())
 			}
 		}
-		return sb.String()
+		return buf.Bytes()
 	}
 
-	sb.WriteString("<")
-	sb.WriteString(e.element)
+	buf.WriteString("<")
+	buf.WriteString(e.element)
 
-	if e.attributes != nil {
-		sb.WriteString(" ")
-		sb.WriteString(*e.attributes)
+	if attributes != nil {
+		buf.WriteString(" ")
+		buf.WriteString(*attributes)
 	}
 
 	if e.selfClosing {
-		sb.WriteString(" />")
-		return sb.String()
+		buf.WriteString(" />")
+		return buf.Bytes()
 	}
 
-	sb.WriteString(">")
-	if e.value != nil {
-		sb.WriteString(*e.value)
+	buf.WriteString(">")
+
+	if value != nil {
+		buf.WriteString(*value)
 	}
-	if e.children != nil {
-		for _, c := range *e.children {
-			sb.WriteString(c.resolve())
+
+	if children != nil {
+		for _, c := range *children {
+			buf.Write(c.resolve())
 		}
 	}
-	sb.WriteString("</")
-	sb.WriteString(e.element)
-	sb.WriteString(">")
 
-	return sb.String()
+	buf.WriteString("</")
+	buf.WriteString(e.element)
+	buf.WriteString(">")
+
+	return buf.Bytes()
 }
 
 // SC marks the element as self-closing.
@@ -107,14 +114,22 @@ func ERAW(value string) Elem {
 
 // C creates an Elem with escaped HTML content or plain text.
 func C(value interface{}) Elem {
-	escaped := html.EscapeString(fmt.Sprintf("%v", value))
-	return ERAW(escaped)
+	switch v := value.(type) {
+	case string:
+		return ERAW(html.EscapeString(v))
+	default:
+		return ERAW(html.EscapeString(fmt.Sprintf("%v", value)))
+	}
 }
 
 // CR creates an Elem with unescaped HTML content or plain text.
 func CR(value interface{}) Elem {
-	raw := fmt.Sprintf("%v", value)
-	return ERAW(raw)
+	switch v := value.(type) {
+	case string:
+		return ERAW(v)
+	default:
+		return ERAW(fmt.Sprintf("%v", value))
+	}
 }
 
 // IF returns trueCase if the condition is true, otherwise returns an empty Elem.
