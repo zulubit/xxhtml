@@ -4,7 +4,7 @@ A simple Go library to create HTML elements programmatically.
 
 ## Installation
 
-    go get github.com/your-username/your-library-name
+    go get github.com/6oof/xxhtml
 
 ## Usage
 
