@@ -1,6 +1,9 @@
 package x
 
-import "html"
+import (
+	"html"
+	"strings"
+)
 
 // Elem represents an HTML element with attributes, text, and children.
 type Elem struct {
@@ -31,55 +34,51 @@ func (tr Elem) Render() []byte {
 
 // resolve constructs the HTML string for the element and recursively for its children.
 func (tr Elem) resolve() string {
+	var sb strings.Builder
+
 	if tr.element == "" {
-		// If the element is raw text, return it directly along with any children.
-		chiraw := ""
+		sb.WriteString(tr.value)
 		for _, c := range tr.children {
-			chiraw += c.resolve()
+			sb.WriteString(c.resolve())
 		}
-		return tr.value + chiraw
+		return sb.String()
 	}
 
-	// Start with the opening tag.
-	elp1 := "<" + tr.element
+	sb.WriteString("<")
+	sb.WriteString(tr.element)
 
-	// Add attributes from `X` struct if present.
 	if tr.tag != nil {
 		if tr.tag.Class != "" {
-			elp1 += " class=\"" + tr.tag.Class + "\""
+			sb.WriteString(" class=\"")
+			sb.WriteString(tr.tag.Class)
+			sb.WriteString("\"")
 		}
 		if tr.tag.Id != "" {
-			elp1 += " id=\"" + tr.tag.Id + "\""
+			sb.WriteString(" id=\"")
+			sb.WriteString(tr.tag.Id)
+			sb.WriteString("\"")
 		}
 		if tr.tag.Att != "" {
-			elp1 += " " + tr.tag.Att
+			sb.WriteString(" ")
+			sb.WriteString(tr.tag.Att)
 		}
 	}
 
-	// Check if the tag is self-closing.
 	if tr.selfClosing {
-		// Self-closing tags don't need a closing tag, so end with "/>".
-		elp1 += " />"
-		return elp1
+		sb.WriteString(" />")
+		return sb.String()
 	}
 
-	// Close the opening tag.
-	elp1 += ">"
-
-	// Add element value.
-	elp1 += tr.value
-
-	// Recursively resolve children elements.
-	che := ""
+	sb.WriteString(">")
+	sb.WriteString(tr.value)
 	for _, c := range tr.children {
-		che += c.resolve()
+		sb.WriteString(c.resolve())
 	}
+	sb.WriteString("</")
+	sb.WriteString(tr.element)
+	sb.WriteString(">")
 
-	// Construct the closing tag.
-	elp2 := "</" + tr.element + ">"
-
-	// Return the complete HTML string.
-	return elp1 + che + elp2
+	return sb.String()
 }
 
 // E initializes a new Elem with the specified tag name, attributes from X, and optional children.
@@ -193,8 +192,8 @@ func Ol(x X, children ...Elem) Elem {
 }
 
 // Li creates a new <li> (list item) element.
-func Li(x X) Elem {
-	return E("li", x)
+func Li(x X, children ...Elem) Elem {
+	return E("li", x, children...)
 }
 
 // Table creates a new <table> element with optional children.
