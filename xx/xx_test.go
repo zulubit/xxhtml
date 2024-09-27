@@ -6,7 +6,7 @@ import (
 
 // TestE tests the E function for creating HTML elements.
 func TestE(t *testing.T) {
-	elem := E("div", `class="container"`, "Hello, World!")
+	elem := E("div").CLS("container").VAL("Hello, World!")
 	expected := `<div class="container">Hello, World!</div>`
 	if string(elem.Render()) != expected {
 		t.Errorf("E() = %s; want %s", elem.Render(), expected)
@@ -24,13 +24,13 @@ func TestERAW(t *testing.T) {
 
 // TestIF tests the IF function for conditional rendering of HTML elements.
 func TestIF(t *testing.T) {
-	elem := IF(true, E("span", "", "True"))
+	elem := IF(true, E("span").VAL("True"))
 	expected := `<span>True</span>`
 	if string(elem.Render()) != expected {
 		t.Errorf("IF(true) = %s; want %s", elem.Render(), expected)
 	}
 
-	elem = IF(false, E("span", "", "True"))
+	elem = IF(false, E("span").VAL("True"))
 	expected = ``
 	if string(elem.Render()) != expected {
 		t.Errorf("IF(false) = %s; want %s", elem.Render(), expected)
@@ -40,8 +40,8 @@ func TestIF(t *testing.T) {
 // TestFOR tests the FOR function for creating a list of HTML elements.
 func TestFOR(t *testing.T) {
 	elems := FOR([]Elem{
-		E("li", "", "Item 1"),
-		E("li", "", "Item 2"),
+		E("li").VAL("Item 1"),
+		E("li").VAL("Item 2"),
 	})
 	expected := `<li>Item 1</li><li>Item 2</li>`
 	if string(elems.Render()) != expected {
@@ -49,15 +49,15 @@ func TestFOR(t *testing.T) {
 	}
 }
 
-// TestTER tests the TER function for conditional string rendering.
+// TestTER tests the TER function for conditional rendering of HTML elements.
 func TestTER(t *testing.T) {
-	elem := TER(true, E("p", "", "True"), E("p", "", "False"))
+	elem := TER(true, E("p").VAL("True"), E("p").VAL("False"))
 	expected := `<p>True</p>`
 	if string(elem.Render()) != expected {
 		t.Errorf("TER(true) = %s; want %s", elem.Render(), expected)
 	}
 
-	elem = TER(false, E("p", "", "True"), E("p", "", "False"))
+	elem = TER(false, E("p").VAL("True"), E("p").VAL("False"))
 	expected = `<p>False</p>`
 	if string(elem.Render()) != expected {
 		t.Errorf("TER(false) = %s; want %s", elem.Render(), expected)
@@ -97,10 +97,9 @@ func TestSIF(t *testing.T) {
 // TestChildrenRendering tests the rendering of HTML elements with child elements.
 func TestChildrenRendering(t *testing.T) {
 	// Create an element with children
-	parentElem := E("div", `class="parent"`, "",
-		E("span", `class="child"`, "Child 1"),
-		E("span", `class="child"`, "Child 2"),
-	)
+	parentElem := E("div").CLS("parent").
+		C(E("span").CLS("child").VAL("Child 1")).
+		C(E("span").CLS("child").VAL("Child 2"))
 
 	// Expected HTML output
 	expected := `<div class="parent"><span class="child">Child 1</span><span class="child">Child 2</span></div>`

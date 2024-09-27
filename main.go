@@ -10,35 +10,53 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
+// ConvertNode converts an HTML node into a custom Go syntax using the xx package.
 func ConvertNode(n *html.Node) string {
 	if n.Type == html.TextNode {
 		text := strings.TrimSpace(n.Data)
 		if text == "" {
-			// If the text is empty after trimming, return an empty string
 			return ""
 		}
-		return fmt.Sprintf("`%s`", strings.TrimSpace(n.Data))
+		return fmt.Sprintf("xx.ERAW(`%s`)", text)
 	}
 
-	// Handle the element and its attributes
-	var attrs string
+	// Initialize the element with the tag name
+	elem := fmt.Sprintf("xx.E(`%s`)", n.Data)
+
+	// Handle the element's attributes
+	var attrs []string
 	for _, attr := range n.Attr {
-		attrs += fmt.Sprintf(`%s="%s" `, attr.Key, attr.Val)
-	}
-	attrs = strings.TrimSpace(attrs)
-
-	var children []string
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		// Handle both text nodes and element nodes
-		child := strings.TrimSpace(ConvertNode(c))
-		if child != "" {
-			children = append(children, child)
+		if attr.Key == "class" {
+			elem += fmt.Sprintf(".CLS(`%s`)", attr.Val)
+		} else {
+			attrs = append(attrs, fmt.Sprintf(`%s="%s"`, attr.Key, attr.Val))
 		}
 	}
+	for _, attr := range attrs {
+		elem += fmt.Sprintf(".ATT(`%s`)", attr)
+	}
 
-	// Construct the Go code for this element
-	element := fmt.Sprintf(`xx.E("%s", %s, %s)`, n.Data, fmt.Sprintf("`%s`", attrs), strings.Join(children, ", "))
-	return element
+	// Collect text content and child nodes
+	var content string
+	var children []string
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		if c.Type == html.TextNode {
+			content += strings.TrimSpace(c.Data) + " "
+		} else {
+			children = append(children, ConvertNode(c))
+		}
+	}
+	content = strings.TrimSpace(content)
+	if content != "" {
+		elem += fmt.Sprintf(".VAL(`%s`)", content)
+	}
+
+	// Add children to the element with line breaks
+	for _, child := range children {
+		elem += fmt.Sprintf(".C(\n%s\n)", child)
+	}
+
+	return elem
 }
 
 func main() {
@@ -58,11 +76,11 @@ func main() {
 	}
 
 	// Convert the HTML fragment to custom syntax
-	var result string
+	var result strings.Builder
 	for _, node := range doc {
-		result += ConvertNode(node)
+		result.WriteString(ConvertNode(node))
 	}
 
 	fmt.Println("Generated Go code:")
-	fmt.Println(result)
+	fmt.Println(result.String())
 }
