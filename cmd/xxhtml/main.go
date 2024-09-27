@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/6oof/xxhtml/x"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -96,13 +97,16 @@ func ConvertNode(n *html.Node) string {
 	if len(n.Attr) > 0 {
 		var attrParts []string
 		for _, attr := range n.Attr {
-			attrParts = append(attrParts, fmt.Sprintf(`%s="%s"`, attr.Key, attr.Val))
+			if attr.Key == "class" {
+				attrParts = append(attrParts, fmt.Sprintf(`x.Class("%s")`, attr.Val))
+			} else {
+				attrParts = append(attrParts, fmt.Sprintf(`x.Att("%s", "%s")`, attr.Key, attr.Val))
+			}
 		}
 		// Join all attributes into a single string
-		allAttrs := strings.Join(attrParts, " ")
-		elem += fmt.Sprintf("`%s`,\n", allAttrs)
+		elem += strings.Join(attrParts, ", ") + ",\n"
 	} else {
-		elem += `"",` + "\n"
+		elem += "\n"
 	}
 
 	// Collect child nodes

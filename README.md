@@ -20,9 +20,10 @@ import (
 )
 
 func main() {
-    elem := x.Div(`class="container"`, 
-        x.H1("", x.C("Hello, World!")),
-        x.P("", x.C("This is a paragraph.")),
+    elem := x.Div(x.Class("container"), 
+        x.H1(x.C("Hello, World!")),
+        x.P(x.C("This is a paragraph.")),
+        x.Img(x.Class("logo"), x.Att("src", "img.png"))
     )
     response := elem.Render()
     fmt.Println(string(response)) // Outputs: <div class="container"><h1>Hello, World!</h1><p>This is a paragraph.</p></div>
@@ -35,14 +36,14 @@ func main() {
 
 ### Key Functions
 
-- **`E(name string, attributes string, children ...Elem) Elem`**: Creates a new `Elem` with the specified tag name, attributes, and optional children.
+- **`E(name string, children ...Elem) Elem`**: Creates a new `Elem` with the specified tag name and optional children. If the `name` is empty, it will not render the tag itself but will render its children.
 - **`ERAW(value string) Elem`**: Creates an `Elem` with raw HTML content or plain text.
 - **`C(content interface{}) Elem`**: Creates an `Elem` with content that is automatically escaped for safe HTML output.
 - **`CR(content interface{}) Elem`**: Creates an `Elem` with content that is not escaped, for unescaped HTML output.
 
 ### Methods
 
-- **`SC()`**: Marks the `Elem` as self-closing. This method is typically used for HTML elements that do not have closing tags (e.g., `<img>`, `<input>`). 
+- **`SelfClose()`**: Marks the `Elem` as self-closing. This method is typically used for HTML elements that do not have closing tags (e.g., `<img>`, `<input>`). 
 
 ### Control Structures
 
@@ -64,8 +65,8 @@ Convenience functions are provided for self-closing HTML elements, including: `I
 
 ### Notes
 
-- **Self-Closing Tags**: Elements that are self-closing in HTML (like `<img>`, `<input>`, etc.) should have the `selfClosing` attribute set to `true`.
+- **Self-Closing Tags**: Elements that are self-closing in HTML (like `<img>`, `<input>`, etc.) should have the `SelfClose` attribute set to `true`.
 - **Non-Self-Closing Tags**: Most other HTML elements will require a closing tag and can include children elements.
+- **Empty Tag Names**: If an element has an empty tag name, it will not render the opening and closing tags but will render its children if any are present.
 
 Feel free to explore and use these functions to create HTML structures programmatically in your Go applications.
-`Base(attributes string) Elem`**: ibutes string) Elem`**: Creates a self-closing `<base>` element.

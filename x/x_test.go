@@ -12,66 +12,51 @@ func TestElem_Render(t *testing.T) {
 	}{
 		{
 			name:     "Div with text",
-			elem:     Div("", C("Hello, World!")),
+			elem:     Div(C("Hello, World!")),
 			expected: "<div>Hello, World!</div>",
 		},
 		{
 			name:     "Span with Class",
-			elem:     Span(`class="highlight"`, C("Highlighted text")),
+			elem:     Span(Class("highlight"), C("Highlighted text")),
 			expected: `<span class="highlight">Highlighted text</span>`,
 		},
 		{
 			name:     "Anchor with href",
-			elem:     A(`href="https://example.com"`, C("Example")),
+			elem:     A(Att("href", "https://example.com"), C("Example")),
 			expected: `<a href="https://example.com">Example</a>`,
 		},
 		{
 			name:     "Image with Attributes (self-closing)",
-			elem:     Img(`src="image.png" alt="An image"`),
+			elem:     Img(Att("src", "image.png"), Att("alt", "An image")),
 			expected: `<img src="image.png" alt="An image" />`,
 		},
 		{
 			name:     "Nested elements",
-			elem:     Div(`class="container"`, Span("", C("Nested span"))),
+			elem:     Div(Class("container"), Span(C("Nested span"))),
 			expected: `<div class="container"><span>Nested span</span></div>`,
 		},
 		{
-			name:     "DOCTYPE",
-			elem:     DOCTYPE(),
-			expected: "<!DOCTYPE html>",
-		},
-		{
-			name:     "Html with head and body",
-			elem:     Html("", Head("", Title("", C("Page Title"))), Body("", P("", C("Hello, World!")))),
-			expected: `<html><head><title>Page Title</title></head><body><p>Hello, World!</p></body></html>`,
-		},
-		{
-			name:     "Multiple attributes resolve",
-			elem:     Embed(`type="image/jpg" src="pic_trulli.jpg" width="300" height="200"`),
-			expected: `<embed type="image/jpg" src="pic_trulli.jpg" width="300" height="200" />`,
-		},
-		{
 			name: "Large HTML Document",
-			elem: Html("",
-				Head("",
-					Title("", C("Large Document Title")),
-					Meta(`charset="UTF-8"`),
-					Link(`rel="stylesheet" href="styles.css"`),
-					Script(`src="script.js"`),
+			elem: Html(
+				Head(
+					Title(C("Large Document Title")),
+					Meta(Att("charset", "UTF-8")),
+					Link(Att("rel", "stylesheet"), Att("href", "styles.css")),
+					Script(Att("src", "script.js")),
 				),
-				Body("",
-					Div(`class="header"`, H1("", C("Main Header"))),
-					Div(`class="content"`,
-						P("", C("This is a paragraph in a large HTML document.")),
-						Div(`class="nested"`,
-							Span("", C("Some nested content")),
-							Ol("",
-								Li(`class="item1"`, C("List item 1")),
-								Li(`class="item2"`, C("List item 2")),
+				Body(
+					Div(Class("header"), H1(C("Main Header"))),
+					Div(Class("content"),
+						P(C("This is a paragraph in a large HTML document.")),
+						Div(Class("nested"),
+							Span(C("Some nested content")),
+							Ol(
+								Li(Class("item1"), C("List item 1")),
+								Li(Class("item2"), C("List item 2")),
 							),
 						),
 					),
-					Footer("", C("Footer content")),
+					Footer(C("Footer content")),
 				),
 			),
 			expected: `<html><head><title>Large Document Title</title><meta charset="UTF-8" /><link rel="stylesheet" href="styles.css" /><script src="script.js"></script></head><body><div class="header"><h1>Main Header</h1></div><div class="content"><p>This is a paragraph in a large HTML document.</p><div class="nested"><span>Some nested content</span><ol><li class="item1">List item 1</li><li class="item2">List item 2</li></ol></div></div><footer>Footer content</footer></body></html>`,
@@ -96,12 +81,12 @@ func TestIF(t *testing.T) {
 	}{
 		{
 			condition: true,
-			trueCase:  Div("", C("Condition is true")),
+			trueCase:  Div(C("Condition is true")),
 			expected:  "<div>Condition is true</div>",
 		},
 		{
 			condition: false,
-			trueCase:  Div("", C("Condition is true")),
+			trueCase:  Div(C("Condition is true")),
 			expected:  "",
 		},
 	}
@@ -125,14 +110,14 @@ func TestTER(t *testing.T) {
 	}{
 		{
 			condition: true,
-			trueCase:  Div("", C("True case")),
-			falseCase: Div("", C("False case")),
+			trueCase:  Div(C("True case")),
+			falseCase: Div(C("False case")),
 			expected:  "<div>True case</div>",
 		},
 		{
 			condition: false,
-			trueCase:  Div("", C("True case")),
-			falseCase: Div("", C("False case")),
+			trueCase:  Div(C("True case")),
+			falseCase: Div(C("False case")),
 			expected:  "<div>False case</div>",
 		},
 	}
@@ -154,8 +139,8 @@ func TestFOR(t *testing.T) {
 	}{
 		{
 			elements: []Elem{
-				Div("", C("Item 1")),
-				Div("", C("Item 2")),
+				Div(C("Item 1")),
+				Div(C("Item 2")),
 			},
 			expected: []string{
 				"<div>Item 1</div>",

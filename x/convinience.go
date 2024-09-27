@@ -3,250 +3,228 @@ package x
 // Convenience functions
 
 // Div creates a new <div> element with optional children.
-func Div(attributes string, children ...Elem) Elem {
-	return E("div", attributes, children...)
+func Div(children ...Elem) Elem {
+	return E("div", children...)
 }
 
 // Span creates a new <span> element with optional children.
-func Span(attributes string, children ...Elem) Elem {
-	return E("span", attributes, children...)
+func Span(children ...Elem) Elem {
+	return E("span", children...)
 }
 
 // P creates a new <p> (paragraph) element with optional children.
-func P(attributes string, children ...Elem) Elem {
-	return E("p", attributes, children...)
+func P(children ...Elem) Elem {
+	return E("p", children...)
 }
 
 // A creates a new <a> (anchor) element with optional children.
-func A(attributes string, children ...Elem) Elem {
-	return E("a", attributes, children...)
+func A(children ...Elem) Elem {
+	return E("a", children...)
 }
 
 // Img creates a new <img> (image) element. This is a self-closing tag.
-func Img(attributes string) Elem {
-	elem := E("img", attributes)
-	elem.selfClosing = true
-	return elem
+func Img(children ...Elem) Elem {
+	return E("img", children...).SelfClose()
 }
 
 // H1 creates a new <h1> (heading) element with optional children.
-func H1(attributes string, children ...Elem) Elem {
-	return E("h1", attributes, children...)
+func H1(children ...Elem) Elem {
+	return E("h1", children...)
 }
 
 // H2 creates a new <h2> (heading) element with optional children.
-func H2(attributes string, children ...Elem) Elem {
-	return E("h2", attributes, children...)
+func H2(children ...Elem) Elem {
+	return E("h2", children...)
 }
 
 // H3 creates a new <h3> (heading) element with optional children.
-func H3(attributes string, children ...Elem) Elem {
-	return E("h3", attributes, children...)
+func H3(children ...Elem) Elem {
+	return E("h3", children...)
 }
 
 // Ul creates a new <ul> (unordered list) element with optional children.
-func Ul(attributes string, children ...Elem) Elem {
-	return E("ul", attributes, children...)
+func Ul(children ...Elem) Elem {
+	return E("ul", children...)
 }
 
 // Ol creates a new <ol> (ordered list) element with optional children.
-func Ol(attributes string, children ...Elem) Elem {
-	return E("ol", attributes, children...)
+func Ol(children ...Elem) Elem {
+	return E("ol", children...)
 }
 
 // Li creates a new <li> (list item) element with optional children.
-func Li(attributes string, children ...Elem) Elem {
-	return E("li", attributes, children...)
+func Li(children ...Elem) Elem {
+	return E("li", children...)
 }
 
 // Table creates a new <table> element with optional children.
-func Table(attributes string, children ...Elem) Elem {
-	return E("table", attributes, children...)
+func Table(children ...Elem) Elem {
+	return E("table", children...)
 }
 
 // Tr creates a new <tr> (table row) element with optional children.
-func Tr(attributes string, children ...Elem) Elem {
-	return E("tr", attributes, children...)
+func Tr(children ...Elem) Elem {
+	return E("tr", children...)
 }
 
 // Td creates a new <td> (table cell) element with optional children.
-func Td(attributes string, children ...Elem) Elem {
-	return E("td", attributes, children...)
+func Td(children ...Elem) Elem {
+	return E("td", children...)
 }
 
 // Th creates a new <th> (table header cell) element with optional children.
-func Th(attributes string, children ...Elem) Elem {
-	return E("th", attributes, children...)
+func Th(children ...Elem) Elem {
+	return E("th", children...)
 }
 
 // Form creates a new <form> element with optional children.
-func Form(attributes string, children ...Elem) Elem {
-	return E("form", attributes, children...)
+func Form(children ...Elem) Elem {
+	return E("form", children...)
 }
 
 // Input creates a new <input> element. This is a self-closing tag.
-func Input(attributes string) Elem {
-	elem := E("input", attributes)
-	elem.selfClosing = true
-	return elem
+func Input(children ...Elem) Elem {
+	return E("input", children...).SelfClose()
 }
 
 // Button creates a new <button> element with optional children.
-func Button(attributes string, children ...Elem) Elem {
-	return E("button", attributes, children...)
+func Button(children ...Elem) Elem {
+	return E("button", children...)
 }
 
 // Label creates a new <label> element with optional children.
-func Label(attributes string, children ...Elem) Elem {
-	return E("label", attributes, children...)
+func Label(children ...Elem) Elem {
+	return E("label", children...)
 }
 
 // Article creates a new <article> element with optional children.
-func Article(attributes string, children ...Elem) Elem {
-	return E("article", attributes, children...)
+func Article(children ...Elem) Elem {
+	return E("article", children...)
 }
 
 // Aside creates a new <aside> element with optional children.
-func Aside(attributes string, children ...Elem) Elem {
-	return E("aside", attributes, children...)
+func Aside(children ...Elem) Elem {
+	return E("aside", children...)
 }
 
 // Header creates a new <header> element with optional children.
-func Header(attributes string, children ...Elem) Elem {
-	return E("header", attributes, children...)
+func Header(children ...Elem) Elem {
+	return E("header", children...)
 }
 
 // Footer creates a new <footer> element with optional children.
-func Footer(attributes string, children ...Elem) Elem {
-	return E("footer", attributes, children...)
+func Footer(children ...Elem) Elem {
+	return E("footer", children...)
 }
 
 // Main creates a new <main> element with optional children.
-func Main(attributes string, children ...Elem) Elem {
-	return E("main", attributes, children...)
+func Main(children ...Elem) Elem {
+	return E("main", children...)
 }
 
 // Section creates a new <section> element with optional children.
-func Section(attributes string, children ...Elem) Elem {
-	return E("section", attributes, children...)
+func Section(children ...Elem) Elem {
+	return E("section", children...)
 }
 
 // Nav creates a new <nav> element with optional children.
-func Nav(attributes string, children ...Elem) Elem {
-	return E("nav", attributes, children...)
+func Nav(children ...Elem) Elem {
+	return E("nav", children...)
 }
 
 // Figure creates a new <figure> element with optional children.
-func Figure(attributes string, children ...Elem) Elem {
-	return E("figure", attributes, children...)
+func Figure(children ...Elem) Elem {
+	return E("figure", children...)
 }
 
 // Figcaption creates a new <figcaption> element with optional children.
-func Figcaption(attributes string, children ...Elem) Elem {
-	return E("figcaption", attributes, children...)
+func Figcaption(children ...Elem) Elem {
+	return E("figcaption", children...)
 }
 
 // Datalist creates a new <datalist> element with optional children.
-func Datalist(attributes string, children ...Elem) Elem {
-	return E("datalist", attributes, children...)
+func Datalist(children ...Elem) Elem {
+	return E("datalist", children...)
 }
 
-// Option creates a new <option> element. This is a self-closing tag.
-func Option(attributes string) Elem {
-	elem := E("option", attributes)
-	elem.selfClosing = true
-	return elem
+// Option creates a new <option> element.
+func Option(children ...Elem) Elem {
+	return E("option", children...).SelfClose()
 }
 
 // Details creates a new <details> element with optional children.
-func Details(attributes string, children ...Elem) Elem {
-	return E("details", attributes, children...)
+func Details(children ...Elem) Elem {
+	return E("details", children...)
 }
 
 // Summary creates a new <summary> element with optional children.
-func Summary(attributes string, children ...Elem) Elem {
-	return E("summary", attributes, children...)
+func Summary(children ...Elem) Elem {
+	return E("summary", children...)
 }
 
 // Dialog creates a new <dialog> element with optional children.
-func Dialog(attributes string, children ...Elem) Elem {
-	return E("dialog", attributes, children...)
+func Dialog(children ...Elem) Elem {
+	return E("dialog", children...)
 }
 
 // Embed creates a new <embed> element. This is a self-closing tag.
-func Embed(attributes string) Elem {
-	elem := E("embed", attributes)
-	elem.selfClosing = true
-	return elem
+func Embed(children ...Elem) Elem {
+	return E("embed", children...).SelfClose()
 }
 
 // Map creates a new <map> element with optional children.
-func Map(attributes string, children ...Elem) Elem {
-	return E("map", attributes, children...)
+func Map(children ...Elem) Elem {
+	return E("map", children...)
 }
 
 // Area creates a new <area> element. This is a self-closing tag.
-func Area(attributes string) Elem {
-	elem := E("area", attributes)
-	elem.selfClosing = true
-	return elem
+func Area(children ...Elem) Elem {
+	return E("area", children...).SelfClose()
 }
 
 // Source creates a new <source> element. This is a self-closing tag.
-func Source(attributes string) Elem {
-	elem := E("source", attributes)
-	elem.selfClosing = true
-	return elem
+func Source(children ...Elem) Elem {
+	return E("source", children...).SelfClose()
 }
 
 // Track creates a new <track> element. This is a self-closing tag.
-func Track(attributes string) Elem {
-	elem := E("track", attributes)
-	elem.selfClosing = true
-	return elem
+func Track(children ...Elem) Elem {
+	return E("track", children...).SelfClose()
 }
 
 // Param creates a new <param> element. This is a self-closing tag.
-func Param(attributes string) Elem {
-	elem := E("param", attributes)
-	elem.selfClosing = true
-	return elem
+func Param(children ...Elem) Elem {
+	return E("param", children...).SelfClose()
 }
 
 // Script creates a new <script> element with optional children.
-func Script(attributes string, children ...Elem) Elem {
-	return E("script", attributes, children...)
+func Script(children ...Elem) Elem {
+	return E("script", children...)
 }
 
 // Style creates a new <style> element with optional children.
-func Style(attributes string, children ...Elem) Elem {
-	return E("style", attributes, children...)
+func Style(children ...Elem) Elem {
+	return E("style", children...)
 }
 
 // Meta creates a new <meta> element. This is a self-closing tag.
-func Meta(attributes string) Elem {
-	elem := E("meta", attributes)
-	elem.selfClosing = true
-	return elem
+func Meta(children ...Elem) Elem {
+	return E("meta", children...).SelfClose()
 }
 
 // Link creates a new <link> element. This is a self-closing tag.
-func Link(attributes string) Elem {
-	elem := E("link", attributes)
-	elem.selfClosing = true
-	return elem
+func Link(children ...Elem) Elem {
+	return E("link", children...).SelfClose()
 }
 
 // Title creates a new <title> element with optional children.
-func Title(attributes string, children ...Elem) Elem {
-	return E("title", attributes, children...)
+func Title(children ...Elem) Elem {
+	return E("title", children...)
 }
 
 // Base creates a new <base> element. This is a self-closing tag.
-func Base(attributes string) Elem {
-	elem := E("base", attributes)
-	elem.selfClosing = true
-	return elem
+func Base(children ...Elem) Elem {
+	return E("base", children...).SelfClose()
 }
 
 // DOCTYPE generates the raw <!DOCTYPE html> declaration.
@@ -255,16 +233,16 @@ func DOCTYPE() Elem {
 }
 
 // Html creates a new <html> element with optional children.
-func Html(attributes string, children ...Elem) Elem {
-	return E("html", attributes, children...)
+func Html(children ...Elem) Elem {
+	return E("html", children...)
 }
 
 // Head creates a new <head> element with optional children.
-func Head(attributes string, children ...Elem) Elem {
-	return E("head", attributes, children...)
+func Head(children ...Elem) Elem {
+	return E("head", children...)
 }
 
 // Body creates a new <body> element with optional children.
-func Body(attributes string, children ...Elem) Elem {
-	return E("body", attributes, children...)
+func Body(children ...Elem) Elem {
+	return E("body", children...)
 }

@@ -1,19 +1,3 @@
-/*
-Package x provides a simple API for creating and rendering HTML elements in Go.
-
-Example usage:
-
-	import (
-		"fmt"
-		"x" // Replace with the actual import path
-	)
-
-	func main() {
-		elem := x.E("div", `class="container" id="main"`, x.C("Hello, World!"))
-		response := elem.Render()
-		fmt.Println(string(response)) // Outputs: <div class="container" id="main">Hello, World!</div>
-	}
-*/
 package x
 
 import (
@@ -23,13 +7,16 @@ import (
 )
 
 // Elem represents an HTML element with attributes, text, and children.
+// eltype: 1 = tag, 2 = class, 3 = attribute, 4 = content
 type Elem struct {
-	element     string
-	children    *[]Elem
-	attributes  *string
-	value       *string
-	selfClosing bool
+	children *[]Elem
+	key      *string
+	value    *string
+	eltype   int
+	sc       bool // Indicates if the element is self-closing
 }
+
+type El []byte
 
 // Render generates the HTML representation of the element and its children as a byte slice.
 func (e Elem) Render() []byte {
@@ -37,79 +24,114 @@ func (e Elem) Render() []byte {
 }
 
 // resolve constructs the HTML string for the element and recursively for its children.
-func (e Elem) resolve() []byte {
+func (e Elem) resolve() El {
 	var buf bytes.Buffer
 
-	attributes := e.attributes
-	children := e.children
-	value := e.value
-
-	if e.element == "" {
-		if value != nil {
-			buf.WriteString(*value)
+	switch e.eltype {
+	case 1: // Tag element
+		if e.value == nil || *e.value == "" {
+			// If the tag name is empty, render only children if they exist.
+			if e.children != nil {
+				for _, c := range *e.children {
+					buf.Write(c.resolve())
+				}
+			}
+			return buf.Bytes()
 		}
-		if children != nil {
-			for _, c := range *children {
-				buf.Write(c.resolve())
+
+		buf.WriteString("<")
+		buf.WriteString(*e.value)
+
+		if e.children != nil {
+			for _, c := range *e.children {
+				if c.eltype == 2 || c.eltype == 3 { // Class or Attribute
+					buf.WriteString(" ")
+					buf.Write(c.resolve())
+				}
 			}
 		}
-		return buf.Bytes()
-	}
 
-	buf.WriteString("<")
-	buf.WriteString(e.element)
-
-	if attributes != nil {
-		buf.WriteString(" ")
-		buf.WriteString(*attributes)
-	}
-
-	if e.selfClosing {
-		buf.WriteString(" />")
-		return buf.Bytes()
-	}
-
-	buf.WriteString(">")
-
-	if value != nil {
-		buf.WriteString(*value)
-	}
-
-	if children != nil {
-		for _, c := range *children {
-			buf.Write(c.resolve())
+		if e.sc { // Self-closing tag
+			buf.WriteString(" />")
+			return buf.Bytes()
 		}
-	}
 
-	buf.WriteString("</")
-	buf.WriteString(e.element)
-	buf.WriteString(">")
+		buf.WriteString(">")
+
+		if e.children != nil {
+			for _, c := range *e.children {
+				if c.eltype == 4 { // Content
+					buf.Write(c.resolve())
+				} else if c.eltype != 2 && c.eltype != 3 { // Other children elements
+					buf.Write(c.resolve())
+				}
+			}
+		}
+
+		buf.WriteString("</")
+		buf.WriteString(*e.value)
+		buf.WriteString(">")
+
+	case 2: // Class element
+		buf.WriteString(`class="`)
+		buf.WriteString(*e.value)
+		buf.WriteString(`"`)
+
+	case 3: // Attribute element
+		buf.WriteString(*e.key)
+		buf.WriteString(`="`)
+		buf.WriteString(*e.value)
+		buf.WriteString(`"`)
+
+	case 4: // Content element
+		buf.WriteString(*e.value)
+
+	default:
+		// Handle any unexpected types if necessary
+	}
 
 	return buf.Bytes()
 }
 
-// SC marks the element as self-closing.
-func (e *Elem) SC() {
-	e.selfClosing = true
-}
-
 // E initializes a new Elem with the specified tag name, attributes, and optional children.
-func E(name string, attributes string, children ...Elem) Elem {
-	var attr *string
-	if attributes != "" {
-		attr = &attributes
-	}
+func E(name string, children ...Elem) Elem {
+	var nam *string
+	nam = &name
 	var childrenPtr *[]Elem
 	if len(children) > 0 {
 		childrenPtr = &children
 	}
-	return Elem{element: name, attributes: attr, children: childrenPtr}
+	return Elem{value: nam, children: childrenPtr, eltype: 1}
+}
+
+// Class creates an Elem representing a CSS class.
+func Class(classes string) Elem {
+	var class *string
+	class = &classes
+	return Elem{eltype: 2, value: class}
+}
+
+// Att creates an Elem representing an HTML attribute with a key-value pair.
+func Att(key string, value string) Elem {
+	var att *string
+	var k *string
+	att = &value
+	k = &key
+	return Elem{eltype: 3, value: att, key: k}
+}
+
+// SelfClose marks an element as self-closing.
+func (e Elem) SelfClose() Elem {
+	if e.eltype == 1 {
+		e.sc = true
+	}
+	return e
 }
 
 // ERAW creates an Elem with raw HTML content or plain text.
 func ERAW(value string) Elem {
 	val := value
-	return Elem{value: &val}
+	return Elem{value: &val, eltype: 4}
 }
 
 // C creates an Elem with escaped HTML content or plain text.
