@@ -108,14 +108,14 @@ func (el Elem) ATT(value string) Elem {
 	return el
 }
 
-// C appends a child element.
+// C appends one or more child elements.
 //
 // Example usage:
 //
-//	div := xx.E("div").C(xx.E("span").VAL("Hello"))
-//	fmt.Println(div.resolve()) // Outputs: <div><span>Hello</span></div>
-func (el Elem) C(child Elem) Elem {
-	el.children = append(el.children, child)
+//	div := xx.E("div").C(xx.E("span").VAL("Hello"), xx.E("p").VAL("World"))
+//	fmt.Println(div.resolve()) // Outputs: <div><span>Hello</span><p>World</p></div>
+func (el Elem) C(children ...Elem) Elem {
+	el.children = append(el.children, children...)
 	return el
 }
 

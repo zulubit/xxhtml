@@ -98,8 +98,7 @@ func TestSIF(t *testing.T) {
 func TestChildrenRendering(t *testing.T) {
 	// Create an element with children
 	parentElem := E("div").CLS("parent").
-		C(E("span").CLS("child").VAL("Child 1")).
-		C(E("span").CLS("child").VAL("Child 2"))
+		C(E("span").CLS("child").VAL("Child 1"), E("span").CLS("child").VAL("Child 2"))
 
 	// Expected HTML output
 	expected := `<div class="parent"><span class="child">Child 1</span><span class="child">Child 2</span></div>`
