@@ -25,7 +25,7 @@ type X struct {
 //
 // Example usage:
 //
-//	elem := xx.E("div", x.X{class: "container", value: "Hello, World!"})
+//	elem := xx.E("div", xx.X{class: "container", value: "Hello, World!"})
 //	response := elem.Render()
 //	fmt.Println(string(response)) // Outputs: <div class="container">Hello, World!</div>
 func (tr Elem) Render() []byte {
@@ -82,14 +82,14 @@ func (tr Elem) resolve() string {
 }
 
 // E initializes a new Elem with the specified tag name, attributes from X, and optional children.
-func E(name string, tag X, children ...Elem) Elem {
+func E(name string, tag *X, children ...Elem) Elem {
 	// Initialize the element with the specified tag name
-	return Elem{element: name, tag: &tag, children: children}
+	return Elem{element: name, tag: tag, children: children}
 }
 
 // ERAW creates an Elem with raw HTML content or plain text.
 func ERAW(value string) Elem {
-	el := E("", X{})
+	el := E("", &X{})
 	el.value = value
 	return el
 }
@@ -141,245 +141,245 @@ func SIF(condition bool, trueCase string) string {
 
 // Div creates a new <div> element with optional children.
 func Div(x X, children ...Elem) Elem {
-	return E("div", x, children...)
+	return E("div", &x, children...)
 }
 
 // Span creates a new <span> element with optional children.
 func Span(x X, children ...Elem) Elem {
-	return E("span", x, children...)
+	return E("span", &x, children...)
 }
 
 // P creates a new <p> (paragraph) element with optional children.
 func P(x X, children ...Elem) Elem {
-	return E("p", x, children...)
+	return E("p", &x, children...)
 }
 
 // A creates a new <a> (anchor) element with optional children.
 func A(x X, children ...Elem) Elem {
-	return E("a", x, children...)
+	return E("a", &x, children...)
 }
 
 // Img creates a new <img> (image) element.
 func Img(x X) Elem {
-	elem := E("img", x)
+	elem := E("img", &x)
 	elem.selfClosing = true
 	return elem
 }
 
 // H1 creates a new <h1> (heading) element with optional children.
 func H1(x X, children ...Elem) Elem {
-	return E("h1", x, children...)
+	return E("h1", &x, children...)
 }
 
 // H2 creates a new <h2> (heading) element with optional children.
 func H2(x X, children ...Elem) Elem {
-	return E("h2", x, children...)
+	return E("h2", &x, children...)
 }
 
 // H3 creates a new <h3> (heading) element with optional children.
 func H3(x X, children ...Elem) Elem {
-	return E("h3", x, children...)
+	return E("h3", &x, children...)
 }
 
 // Ul creates a new <ul> (unordered list) element with optional children.
 func Ul(x X, children ...Elem) Elem {
-	return E("ul", x, children...)
+	return E("ul", &x, children...)
 }
 
 // Ol creates a new <ol> (ordered list) element with optional children.
 func Ol(x X, children ...Elem) Elem {
-	return E("ol", x, children...)
+	return E("ol", &x, children...)
 }
 
 // Li creates a new <li> (list item) element.
 func Li(x X, children ...Elem) Elem {
-	return E("li", x, children...)
+	return E("li", &x, children...)
 }
 
 // Table creates a new <table> element with optional children.
 func Table(x X, children ...Elem) Elem {
-	return E("table", x, children...)
+	return E("table", &x, children...)
 }
 
 // Tr creates a new <tr> (table row) element with optional children.
 func Tr(x X, children ...Elem) Elem {
-	return E("tr", x, children...)
+	return E("tr", &x, children...)
 }
 
 // Td creates a new <td> (table cell) element.
 func Td(x X) Elem {
-	return E("td", x)
+	return E("td", &x)
 }
 
 // Th creates a new <th> (table header cell) element.
 func Th(x X) Elem {
-	return E("th", x)
+	return E("th", &x)
 }
 
 // Form creates a new <form> element with optional children.
 func Form(x X, children ...Elem) Elem {
-	return E("form", x, children...)
+	return E("form", &x, children...)
 }
 
 // Input creates a new <input> element.
 func Input(x X) Elem {
-	elem := E("input", x)
+	elem := E("input", &x)
 	elem.selfClosing = true
 	return elem
 }
 
 // Button creates a new <button> element with optional children.
 func Button(x X, children ...Elem) Elem {
-	return E("button", x, children...)
+	return E("button", &x, children...)
 }
 
 // Label creates a new <label> element with optional children.
 func Label(x X, children ...Elem) Elem {
-	return E("label", x, children...)
+	return E("label", &x, children...)
 }
 
 // Article creates a new <article> element with optional children.
 func Article(x X, children ...Elem) Elem {
-	return E("article", x, children...)
+	return E("article", &x, children...)
 }
 
 // Aside creates a new <aside> element with optional children.
 func Aside(x X, children ...Elem) Elem {
-	return E("aside", x, children...)
+	return E("aside", &x, children...)
 }
 
 // Header creates a new <header> element with optional children.
 func Header(x X, children ...Elem) Elem {
-	return E("header", x, children...)
+	return E("header", &x, children...)
 }
 
 // Footer creates a new <footer> element with optional children.
 func Footer(x X, children ...Elem) Elem {
-	return E("footer", x, children...)
+	return E("footer", &x, children...)
 }
 
 // Main creates a new <main> element with optional children.
 func Main(x X, children ...Elem) Elem {
-	return E("main", x, children...)
+	return E("main", &x, children...)
 }
 
 // Section creates a new <section> element with optional children.
 func Section(x X, children ...Elem) Elem {
-	return E("section", x, children...)
+	return E("section", &x, children...)
 }
 
 // Nav creates a new <nav> element with optional children.
 func Nav(x X, children ...Elem) Elem {
-	return E("nav", x, children...)
+	return E("nav", &x, children...)
 }
 
 // Figure creates a new <figure> element with optional children.
 func Figure(x X, children ...Elem) Elem {
-	return E("figure", x, children...)
+	return E("figure", &x, children...)
 }
 
 // Figcaption creates a new <figcaption> element with optional children.
 func Figcaption(x X, children ...Elem) Elem {
-	return E("figcaption", x, children...)
+	return E("figcaption", &x, children...)
 }
 
 // Datalist creates a new <datalist> element with optional children.
 func Datalist(x X, children ...Elem) Elem {
-	return E("datalist", x, children...)
+	return E("datalist", &x, children...)
 }
 
 // Option creates a new <option> element with optional children.
 func Option(x X) Elem {
-	return E("option", x)
+	return E("option", &x)
 }
 
 // Details creates a new <details> element with optional children.
 func Details(x X, children ...Elem) Elem {
-	return E("details", x, children...)
+	return E("details", &x, children...)
 }
 
 // Summary creates a new <summary> element with optional children.
 func Summary(x X, children ...Elem) Elem {
-	return E("summary", x, children...)
+	return E("summary", &x, children...)
 }
 
 // Dialog creates a new <dialog> element with optional children.
 func Dialog(x X, children ...Elem) Elem {
-	return E("dialog", x, children...)
+	return E("dialog", &x, children...)
 }
 
 // Embed creates a new <embed> element with optional attributes.
 func Embed(x X) Elem {
-	elem := E("embed", x)
+	elem := E("embed", &x)
 	elem.selfClosing = true
 	return elem
 }
 
 // Map creates a new <map> element with optional children.
 func Map(x X, children ...Elem) Elem {
-	return E("map", x, children...)
+	return E("map", &x, children...)
 }
 
 // Area creates a new <area> element with optional attributes.
 func Area(x X) Elem {
-	elem := E("area", x)
+	elem := E("area", &x)
 	elem.selfClosing = true
 	return elem
 }
 
 // Source creates a new <source> element with optional attributes.
 func Source(x X) Elem {
-	elem := E("source", x)
+	elem := E("source", &x)
 	elem.selfClosing = true
 	return elem
 }
 
 // Track creates a new <track> element with optional attributes.
 func Track(x X) Elem {
-	elem := E("track", x)
+	elem := E("track", &x)
 	elem.selfClosing = true
 	return elem
 }
 
 // Param creates a new <param> element with optional attributes.
 func Param(x X) Elem {
-	elem := E("param", x)
+	elem := E("param", &x)
 	elem.selfClosing = true
 	return elem
 }
 
 // Script creates a new <script> element with optional attributes.
 func Script(x X) Elem {
-	return E("script", x)
+	return E("script", &x)
 }
 
 // Style creates a new <style> element with optional children.
 func Style(x X, children ...Elem) Elem {
-	return E("style", x, children...)
+	return E("style", &x, children...)
 }
 
 // Meta creates a new <meta> element with optional attributes.
 func Meta(x X) Elem {
-	elem := E("meta", x)
+	elem := E("meta", &x)
 	elem.selfClosing = true
 	return elem
 }
 
 // Link creates a new <link> element with optional attributes.
 func Link(x X) Elem {
-	elem := E("link", x)
+	elem := E("link", &x)
 	elem.selfClosing = true
 	return elem
 }
 
 // Title creates a new <title> element with optional children.
 func Title(x X, children ...Elem) Elem {
-	return E("title", x, children...)
+	return E("title", &x, children...)
 }
 
 // Base creates a new <base> element with optional attributes.
 func Base(x X) Elem {
-	elem := E("base", x)
+	elem := E("base", &x)
 	elem.selfClosing = true
 	return elem
 }
@@ -391,15 +391,15 @@ func DOCTYPE() Elem {
 
 // Html creates a new <html> element with optional children.
 func Html(x X, children ...Elem) Elem {
-	return E("html", x, children...)
+	return E("html", &x, children...)
 }
 
 // Head creates a new <body> element with optional children.
 func Head(x X, children ...Elem) Elem {
-	return E("head", x, children...)
+	return E("head", &x, children...)
 }
 
 // Body creates a new <body> element with optional children.
 func Body(x X, children ...Elem) Elem {
-	return E("body", x, children...)
+	return E("body", &x, children...)
 }

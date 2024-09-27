@@ -84,7 +84,7 @@ func ConvertNode(n *html.Node) string {
 	elemFunc, exists := tagToFunc[n.Data]
 	if !exists {
 		elemFunc = "x.E" // fallback to generic E() function
-		elem = fmt.Sprintf(`%s("%s",x.X{`, elemFunc, n.Data)
+		elem = fmt.Sprintf(`%s("%s",&x.X{`, elemFunc, n.Data)
 	} else {
 		elem = fmt.Sprintf("%s(x.X{", elemFunc)
 	}
