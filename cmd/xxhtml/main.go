@@ -66,6 +66,9 @@ var tagToFunc = map[string]string{
 
 // ConvertNode converts an HTML node into a custom Go syntax using the x package.
 func ConvertNode(n *html.Node) string {
+	if n.Type == html.CommentNode {
+		return ""
+	}
 	if n.Type == html.TextNode {
 		text := strings.TrimSpace(n.Data)
 		if text == "" {
@@ -115,7 +118,7 @@ func ConvertNode(n *html.Node) string {
 	if len(children) > 0 {
 		elem += strings.Join(children, "\n") + "\n),"
 	} else {
-		elem += ")"
+		elem += "),\n"
 	}
 
 	return elem
