@@ -621,8 +621,8 @@ func Title(x X, children ...Elem) Elem {
 //
 // Example usage:
 //
-//	base := xx.Base(xx.X{att: `href="https://example.com/"`})
-//	fmt.Println(base.resolve()) // Outputs: <base href="https://example.com/">
+//	base := xx.Base(xx.X{att: `href="https://examples.com/"`})
+//	fmt.Println(base.resolve()) // Outputs: <base href="https://examples.com/">
 func Base(x X) Elem {
 	return E("base", x)
 }
