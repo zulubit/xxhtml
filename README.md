@@ -23,6 +23,7 @@ func main() {
     response := elem.Render()
     fmt.Println(string(response)) // Outputs: <div class="container"><h1>Hello, World!</h1><p>This is a paragraph.</p></div>
 }
+```
 
 
 ### Key Types
@@ -93,5 +94,3 @@ func main() {
 - **`Meta(x X) Elem`**: Creates a self-closing `<meta>` element.
 - **`Link(x X) Elem`**: Creates a self-closing `<link>` element.
 - **`Base(x X) Elem`**: Creates a self-closing `<base>` element.
-
-
