@@ -93,15 +93,11 @@ func ConvertNode(n *html.Node) string {
 	if len(n.Attr) > 0 {
 		var attrParts []string
 		for _, attr := range n.Attr {
-			if attr.Key == "class" {
-				attrParts = append(attrParts, fmt.Sprintf("Class: `%s`", attr.Val))
-			} else if attr.Key == "id" {
-				attrParts = append(attrParts, fmt.Sprintf("Id: `%s`", attr.Val))
-			} else {
-				attrParts = append(attrParts, fmt.Sprintf("Att: `%s=\"%s\"`", attr.Key, attr.Val))
-			}
+			attrParts = append(attrParts, fmt.Sprintf(`%s="%s"`, attr.Key, attr.Val))
 		}
-		elem += strings.Join(attrParts, ", ") + "},\n"
+		// Join all attributes into a single string
+		allAttrs := strings.Join(attrParts, " ")
+		elem += fmt.Sprintf("Att: `%s`},\n", allAttrs)
 	} else {
 		elem += "},\n"
 	}
@@ -164,7 +160,7 @@ func parseFragment(htmlContent string) ([]*html.Node, error) {
 	return doc, nil
 }
 
-func main() {
+func initCli() {
 	// Define the --full flag
 	fullFlag := flag.Bool("full", false, "Parse the entire HTML document")
 	flag.Parse()
@@ -211,4 +207,8 @@ func main() {
 		s = s[:len(s)-1]
 	}
 	fmt.Println(s)
+}
+
+func main() {
+	initCli()
 }

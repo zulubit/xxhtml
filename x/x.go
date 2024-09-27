@@ -25,7 +25,7 @@ type X struct {
 //
 // Example usage:
 //
-//	elem := xx.E("div", xx.X{class: "container", value: "Hello, World!"})
+//	elem := xx.E("div", x.X{class: "container", value: "Hello, World!"})
 //	response := elem.Render()
 //	fmt.Println(string(response)) // Outputs: <div class="container">Hello, World!</div>
 func (tr Elem) Render() []byte {

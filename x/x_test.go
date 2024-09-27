@@ -46,6 +46,11 @@ func TestElem_Render(t *testing.T) {
 			expected: "<html><head><title>Page Title</title></head><body><p>Hello, World!</p></body></html>",
 		},
 		{
+			name:     "Multiple attributes resolve",
+			elem:     Embed(X{Att: `type="image/jpg" src="pic_trulli.jpg" width="300" height="200"`}),
+			expected: `<embed type="image/jpg" src="pic_trulli.jpg" width="300" height="200" />`,
+		},
+		{
 			name: "Large HTML Document",
 			elem: Html(X{},
 				Head(X{},
