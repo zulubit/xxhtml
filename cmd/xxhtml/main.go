@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/6oof/xxhtml/x"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
