@@ -10,6 +10,30 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
+// map of HTML tag names to corresponding xx convenience functions
+var tagToFunc = map[string]string{
+	"div":      "xx.Div()",
+	"span":     "xx.Span()",
+	"p":        "xx.P()",
+	"a":        "xx.A()",
+	"img":      "xx.Img()",
+	"h1":       "xx.H1()",
+	"h2":       "xx.H2()",
+	"h3":       "xx.H3()",
+	"ul":       "xx.Ul()",
+	"ol":       "xx.Ol()",
+	"li":       "xx.Li()",
+	"table":    "xx.Table()",
+	"tr":       "xx.Tr()",
+	"td":       "xx.Td()",
+	"th":       "xx.Th()",
+	"form":     "xx.Form()",
+	"input":    "xx.Input()",
+	"button":   "xx.Button()",
+	"label":    "xx.Label()",
+	"textarea": "xx.Textarea()",
+}
+
 // ConvertNode converts an HTML node into a custom Go syntax using the xx package.
 func ConvertNode(n *html.Node) string {
 	if n.Type == html.TextNode {
@@ -20,8 +44,14 @@ func ConvertNode(n *html.Node) string {
 		return fmt.Sprintf("xx.ERAW(`%s`)", text)
 	}
 
-	// Initialize the element with the tag name
-	elem := fmt.Sprintf("xx.E(`%s`)", n.Data)
+	// Check if the tag has a corresponding convenience function
+	elemFunc, exists := tagToFunc[n.Data]
+	if !exists {
+		elemFunc = fmt.Sprintf("xx.E(`%s`)", n.Data) // fallback to generic E() function
+	}
+
+	// Initialize the element with the tag name or the convenience function
+	elem := elemFunc
 
 	// Handle the element's attributes
 	var attrs []string
