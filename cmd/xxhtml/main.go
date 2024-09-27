@@ -87,9 +87,9 @@ func ConvertNode(n *html.Node) string {
 	elemFunc, exists := tagToFunc[n.Data]
 	if !exists {
 		elemFunc = "x.E" // fallback to generic E() function
-		elem = fmt.Sprintf(`%s("%s",&x.X{`, elemFunc, n.Data)
+		elem = fmt.Sprintf(`%s("%s",`, elemFunc, n.Data)
 	} else {
-		elem = fmt.Sprintf("%s(x.X{", elemFunc)
+		elem = fmt.Sprintf("%s(", elemFunc)
 	}
 
 	// Handle the element's attributes
@@ -100,9 +100,9 @@ func ConvertNode(n *html.Node) string {
 		}
 		// Join all attributes into a single string
 		allAttrs := strings.Join(attrParts, " ")
-		elem += fmt.Sprintf("Att: `%s`},\n", allAttrs)
+		elem += fmt.Sprintf("`%s`,\n", allAttrs)
 	} else {
-		elem += "},\n"
+		elem += `"",` + "\n"
 	}
 
 	// Collect child nodes
