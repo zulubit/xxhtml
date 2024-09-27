@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -57,10 +58,13 @@ var tagToFunc = map[string]string{
 	"link":       "x.Link",
 	"title":      "x.Title",
 	"base":       "x.Base",
+	"html":       "x.Html",
+	"!doctype":   "x.DOCTYPE", // Special handling for DOCTYPE
+	"head":       "x.Head",
+	"body":       "x.Body",
 }
 
 // ConvertNode converts an HTML node into a custom Go syntax using the x package.
-
 func ConvertNode(n *html.Node) string {
 	if n.Type == html.TextNode {
 		text := strings.TrimSpace(n.Data)
@@ -68,6 +72,11 @@ func ConvertNode(n *html.Node) string {
 			return ""
 		}
 		return fmt.Sprintf("x.C(`%s`),", text)
+	}
+
+	// Handle the DOCTYPE separately
+	if n.Type == html.DoctypeNode {
+		return "x.DOCTYPE(),\n"
 	}
 
 	elem := ""
@@ -116,28 +125,90 @@ func ConvertNode(n *html.Node) string {
 	return elem
 }
 
-func main() {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Enter your HTML:")
-	htmlContent, _ := reader.ReadString('\n')
+// PrintNode prints the details of an HTML node for debugging.
+func PrintNode(n *html.Node, indent int) {
+	if n == nil {
+		return
+	}
 
-	// Parse the HTML fragment
+	// Indent based on node depth
+	fmt.Printf("%sNode Type: %d, Data: %s\n", strings.Repeat("  ", indent), n.Type, n.Data)
+	for _, attr := range n.Attr {
+		fmt.Printf("%s  Attribute: %s=\"%s\"\n", strings.Repeat("  ", indent+1), attr.Key, attr.Val)
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		PrintNode(c, indent+1)
+	}
+}
+
+// parseFull parses the entire HTML document and returns the root node.
+func parseFull(htmlContent string) (*html.Node, error) {
+	doc, err := html.Parse(strings.NewReader(htmlContent))
+	if err != nil {
+		return nil, fmt.Errorf("error parsing HTML document: %w", err)
+	}
+	return doc, nil
+}
+
+// parseFragment parses an HTML fragment within the body element and returns the nodes.
+func parseFragment(htmlContent string) ([]*html.Node, error) {
 	doc, err := html.ParseFragment(strings.NewReader(htmlContent), &html.Node{
 		Type:     html.ElementNode,
 		Data:     "body",
 		DataAtom: atom.Body,
 	})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error parsing HTML fragment: %v\n", err)
-		return
+		return nil, fmt.Errorf("error parsing HTML fragment: %w", err)
+	}
+	return doc, nil
+}
+
+func main() {
+	// Define the --full flag
+	fullFlag := flag.Bool("full", false, "Parse the entire HTML document")
+	flag.Parse()
+
+	// Read HTML input
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("Enter your HTML:")
+	htmlContent, _ := reader.ReadString('\n')
+
+	// Determine the parse mode based on the flag
+	var nodes []string
+
+	if *fullFlag {
+		doc, parseErr := parseFull(htmlContent)
+		if parseErr != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", parseErr)
+			return
+		}
+		// fmt.Println("Node structure for full document:")
+		// PrintNode(doc, 0)
+		// Convert the entire document, treat it as a root node
+		nodes = []string{ConvertNode(doc)}
+	} else {
+		doc, parseErr := parseFragment(htmlContent)
+		if parseErr != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", parseErr)
+			return
+		}
+		// Convert each fragment node
+		for _, node := range doc {
+			nodes = append(nodes, ConvertNode(node))
+		}
 	}
 
-	// Convert the HTML fragment to custom syntax
+	// Convert the HTML content to custom syntax
 	var result strings.Builder
-	for _, node := range doc {
-		result.WriteString(ConvertNode(node))
+	for _, node := range nodes {
+		result.WriteString(node)
 	}
 	s := result.String()
 	fmt.Println("\033[31mGenerated Go code:\033[0m")
-	fmt.Println(s[:len(s)-1])
+	// Remove trailing comma for proper syntax
+	if len(s) > 0 && s[len(s)-1] == ',' {
+		s = s[:len(s)-1]
+	}
+	fmt.Println(s)
 }

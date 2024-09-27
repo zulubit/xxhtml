@@ -16,24 +16,34 @@ func TestElem_Render(t *testing.T) {
 			expected: "<div>Hello, World!</div>",
 		},
 		{
-			name:     "Span with class",
-			elem:     Span(X{class: "highlight"}, C("Highlighted text")),
+			name:     "Span with Class",
+			elem:     Span(X{Class: "highlight"}, C("Highlighted text")),
 			expected: "<span class=\"highlight\">Highlighted text</span>",
 		},
 		{
 			name:     "Anchor with href",
-			elem:     A(X{att: `href="https://example.com"`}, C("Example")),
+			elem:     A(X{Att: `href="https://example.com"`}, C("Example")),
 			expected: "<a href=\"https://example.com\">Example</a>",
 		},
 		{
-			name:     "Image with attributes",
-			elem:     Img(X{att: `src="image.png" alt="An image"`}),
-			expected: "<img src=\"image.png\" alt=\"An image\"></img>",
+			name:     "Image with Attributes (self-closing)",
+			elem:     Img(X{Att: `src="image.png" alt="An image"`}),
+			expected: "<img src=\"image.png\" alt=\"An image\" />",
 		},
 		{
 			name:     "Nested elements",
-			elem:     Div(X{class: "container"}, Span(X{}, C("Nested span"))),
+			elem:     Div(X{Class: "container"}, Span(X{}, C("Nested span"))),
 			expected: "<div class=\"container\"><span>Nested span</span></div>",
+		},
+		{
+			name:     "DOCTYPE",
+			elem:     DOCTYPE(),
+			expected: "<!DOCTYPE html>",
+		},
+		{
+			name:     "Html with head and body",
+			elem:     Html(X{}, Head(X{}, Title(X{}, C("Page Title"))), Body(X{}, P(X{}, C("Hello, World!")))),
+			expected: "<html><head><title>Page Title</title></head><body><p>Hello, World!</p></body></html>",
 		},
 	}
 
