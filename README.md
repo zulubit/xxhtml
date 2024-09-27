@@ -23,8 +23,8 @@ func main() {
     router := http.NewServeMux()
 
     count := []int{1, 2, 3}
-    tm := xx.E("div", `class="test test2"`, "hello world").Add(
-        xx.E("h1", `class="asdf"`, "hello world").Add(
+    tm := xx.E("div", `class="test test2"`, "hello world",
+        xx.E("h1", `class="asdf"`, "hello world",
             xx.E("span", "", xx.STER(false, "yes", "no")),
             xx.FOR(func(count []int) []xx.Elem {
                 el := []xx.Elem{}
