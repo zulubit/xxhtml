@@ -7,9 +7,102 @@ import (
 	"os"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/textarea"
+	"github.com/charmbracelet/bubbletea"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
+
+type model struct {
+	input      textarea.Model
+	generated  string
+	fullFlag   bool
+	errMessage string
+}
+
+func initialModel() model {
+	ta := textarea.New()
+	ta.Placeholder = "Paste your HTML here..."
+	ta.Focus()
+	ta.SetWidth(80)
+	ta.SetHeight(20) // Set height to accommodate more lines of input
+	return model{
+		input: ta,
+	}
+}
+
+func (m model) Init() tea.Cmd {
+	return textarea.Blink
+}
+
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "ctrl+c", "q":
+			return m, tea.Quit
+		case "enter":
+			if m.input.Value() != "" {
+				m.generated = processHTML(m.input.Value(), m.fullFlag)
+			} else {
+				m.errMessage = "No HTML provided!"
+			}
+		}
+	}
+	var cmd tea.Cmd
+	m.input, cmd = m.input.Update(msg)
+	return m, cmd
+}
+
+func (m model) View() string {
+	if m.generated != "" {
+		return fmt.Sprintf("\033[31mGenerated Go code:\033[0m\n%s\nPress q to exit.", m.generated)
+	} else if m.errMessage != "" {
+		return fmt.Sprintf("\033[31mError:\033[0m %s\n%s", m.errMessage, m.input.View())
+	} else {
+		return fmt.Sprintf("Paste your HTML and press Enter to generate Go code:\n%s", m.input.View())
+	}
+}
+
+func processHTML(htmlContent string, fullFlag bool) string {
+	var nodes []string
+	if fullFlag {
+		doc, err := parseFull(htmlContent)
+		if err != nil {
+			return fmt.Sprintf("Error parsing HTML document: %v", err)
+		}
+		nodes = []string{ConvertNode(doc)}
+	} else {
+		doc, err := parseFragment(htmlContent)
+		if err != nil {
+			return fmt.Sprintf("Error parsing HTML fragment: %v", err)
+		}
+		for _, node := range doc {
+			nodes = append(nodes, ConvertNode(node))
+		}
+	}
+
+	var result strings.Builder
+	for _, node := range nodes {
+		result.WriteString(node)
+	}
+	s := result.String()
+
+	// Remove trailing comma for proper syntax
+	if len(s) > 0 && s[len(s)-1] == ',' {
+		s = s[:len(s)-1]
+	}
+	return s
+}
+
+func main() {
+	m := initialModel()
+	p := tea.NewProgram(m)
+	if err := p.Start(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error starting program: %v", err)
+		os.Exit(1)
+	}
+}
 
 // map of HTML tag names to corresponding x convenience functions
 var tagToFunc = map[string]string{
@@ -213,8 +306,4 @@ func initCli() {
 		s = s[:len(s)-1]
 	}
 	fmt.Println(s)
-}
-
-func main() {
-	initCli()
 }
