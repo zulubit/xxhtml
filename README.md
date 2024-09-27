@@ -4,60 +4,72 @@ A simple Go library to create HTML elements programmatically.
 
 ## Installation
 
-    go get github.com/6oof/xxhtml
-
-## Usage
-
+```bash
+go get github.com/6oof/xxhtml
 ```
-    package main
 
-    import (
-        "net/http"
-        "strconv"
-        "github.com/your-username/your-library-name"
+## Example
+
+```go
+package main
+
+import (
+    "net/http"
+    "strconv"
+    "github.com/6oof/xxhtml"
+)
+
+func main() {
+    router := http.NewServeMux()
+
+    count := []int{1, 2, 3}
+    tm := xx.E("div", `class="test test2"`, "hello world").Add(
+        xx.E("h1", `class="asdf"`, "hello world").Add(
+            xx.E("span", "", xx.STER(false, "yes", "no")),
+            xx.FOR(func(count []int) []xx.Elem {
+                el := []xx.Elem{}
+                for _, c := range count {
+                    el = append(el, xx.E("span", "", strconv.Itoa(c)))
+                }
+                return el
+            }(count)),
+        ),
+        xx.IF(false, xx.E("h1", "", "hello world")),
+        xx.ERAW(`<svg>asdf</svg>`),
     )
 
-    func main() {
-        router := http.NewServeMux()
+    router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        w.Write(tm.Render())
+    })
 
-        count := []int{1, 2, 3}
-        tm := htmlbuilder.XX("div").Cls("test").Cls("test2").Val("hello world").Add(
-            htmlbuilder.XX("h1").Cls("asdf").Val("hello world").Add(
-                htmlbuilder.XX("span").Val(htmlbuilder.Xter(false, "yes", "no")),
-                htmlbuilder.XFOR(func(count []int) []htmlbuilder.Elem {
-                    el := []htmlbuilder.Elem{}
-                    for _, c := range count {
-                        el = append(el, htmlbuilder.XX("span").Val(strconv.Itoa(c)))
-                    }
-                    return el
-                }(count)),
-            ),
-            htmlbuilder.XIF(false, htmlbuilder.XX("h1").Val("hello world"), htmlbuilder.XX("")),
-            htmlbuilder.XX("").Raw().Val(`<svg>asdf</svg>`),
-        )
-
-        router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-            w.Write(tm.CreateResponse())
-        })
-
-        http.ListenAndServe(":8083", router)
-    }
+    http.ListenAndServe(":8083", router)
+}
 ```
 
 ## Documentation
 
-- func XX(name string) Elem
-- func XIF(condition bool, trueCase Elem, falseCase Elem) Elem
-- func XFOR(iterClosure []Elem) Elem
-- func Xter(condition bool, trueCase string, falseCase string) string
+### Element Creation
 
-## Elem Methods
+- `func E(name string, attributes string, value string, children ...Elem) Elem`  
+  Initializes a new `Elem` with the specified tag name, attributes, text content, and children.
 
-- func (tr Elem) Att(s string) Elem
-- func (tr Elem) Cls(s string) Elem
-- func (tr Elem) Val(s string) Elem
-- func (tr Elem) Add(c ...Elem) Elem
-- func (tr Elem) Raw() Elem
-- func (tr Elem) CreateResponse() []byte
-- func (tr Elem) resolve() string
+- `func ERAW(value string) Elem`  
+  Creates a raw HTML element, often used for inserting raw HTML content or plain text.
+
+### Conditional and Loop Functions
+
+- `func IF(condition bool, trueCase Elem) Elem`  
+  Returns `trueCase` if the condition is true, otherwise returns an empty `Elem`.
+
+- `func FOR(iterClosure []Elem) Elem`  
+  Takes a slice of `Elem` and returns a parent `Elem` containing all elements in the slice as its children.
+
+- `func TER(condition bool, trueCase Elem, falseCase Elem) Elem`  
+  Returns `trueCase` if the condition is true, otherwise returns `falseCase`.
+
+- `func STER(condition bool, trueCase string, falseCase string) string`  
+  Returns `trueCase` if the boolean condition is true, otherwise returns `falseCase`.
+
+- `func SIF(condition bool, trueCase string) string`  
+  Returns `trueCase` if the boolean condition is true, otherwise returns an empty string.
 
