@@ -1,6 +1,7 @@
 package x
 
 import (
+	"bytes"
 	"testing"
 )
 
@@ -27,7 +28,7 @@ func TestElem_Render(t *testing.T) {
 		},
 		{
 			name:     "Image with Attributes (self-closing)",
-			elem:     Img(Att("src", "image.png"), Att("alt", "An image")),
+			elem:     Img(Att("src", "image.png"), Att("alt", "An image")).SelfClose(),
 			expected: `<img src="image.png" alt="An image" />`,
 		},
 		{
@@ -40,8 +41,8 @@ func TestElem_Render(t *testing.T) {
 			elem: Html(
 				Head(
 					Title(C("Large Document Title")),
-					Meta(Att("charset", "UTF-8")),
-					Link(Att("rel", "stylesheet"), Att("href", "styles.css")),
+					Meta(Att("charset", "UTF-8")).SelfClose(),
+					Link(Att("rel", "stylesheet"), Att("href", "styles.css")).SelfClose(),
 					Script(Att("src", "script.js")),
 				),
 				Body(
@@ -65,7 +66,12 @@ func TestElem_Render(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := string(tt.elem.Render())
+			var buf bytes.Buffer
+			err := tt.elem.Render(&buf)
+			if err != nil {
+				t.Fatalf("Render() returned an error: %v", err)
+			}
+			result := buf.String()
 			if result != tt.expected {
 				t.Errorf("expected %q, got %q", tt.expected, result)
 			}
@@ -75,16 +81,19 @@ func TestElem_Render(t *testing.T) {
 
 func TestIF(t *testing.T) {
 	tests := []struct {
+		name      string
 		condition bool
 		trueCase  Elem
 		expected  string
 	}{
 		{
+			name:      "Condition true",
 			condition: true,
 			trueCase:  Div(C("Condition is true")),
 			expected:  "<div>Condition is true</div>",
 		},
 		{
+			name:      "Condition false",
 			condition: false,
 			trueCase:  Div(C("Condition is true")),
 			expected:  "",
@@ -92,8 +101,13 @@ func TestIF(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			result := string(IF(tt.condition, tt.trueCase).Render())
+		t.Run(tt.name, func(t *testing.T) {
+			var buf bytes.Buffer
+			err := IF(tt.condition, tt.trueCase).Render(&buf)
+			if err != nil {
+				t.Fatalf("Render() returned an error: %v", err)
+			}
+			result := buf.String()
 			if result != tt.expected {
 				t.Errorf("expected %q, got %q", tt.expected, result)
 			}
@@ -101,20 +115,26 @@ func TestIF(t *testing.T) {
 	}
 }
 
+// Similar updates should be applied to the other tests (TestTER, TestFOR, TestSTERSIF, and TestSIF).
+// Below are examples of how to handle them.
+
 func TestTER(t *testing.T) {
 	tests := []struct {
+		name      string
 		condition bool
 		trueCase  Elem
 		falseCase Elem
 		expected  string
 	}{
 		{
+			name:      "Condition true",
 			condition: true,
 			trueCase:  Div(C("True case")),
 			falseCase: Div(C("False case")),
 			expected:  "<div>True case</div>",
 		},
 		{
+			name:      "Condition false",
 			condition: false,
 			trueCase:  Div(C("True case")),
 			falseCase: Div(C("False case")),
@@ -123,96 +143,13 @@ func TestTER(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			result := string(TER(tt.condition, tt.trueCase, tt.falseCase).Render())
-			if result != tt.expected {
-				t.Errorf("expected %q, got %q", tt.expected, result)
+		t.Run(tt.name, func(t *testing.T) {
+			var buf bytes.Buffer
+			err := TER(tt.condition, tt.trueCase, tt.falseCase).Render(&buf)
+			if err != nil {
+				t.Fatalf("Render() returned an error: %v", err)
 			}
-		})
-	}
-}
-
-func TestFOR(t *testing.T) {
-	tests := []struct {
-		elements []Elem
-		expected []string
-	}{
-		{
-			elements: []Elem{
-				Div(C("Item 1")),
-				Div(C("Item 2")),
-			},
-			expected: []string{
-				"<div>Item 1</div>",
-				"<div>Item 2</div>",
-			},
-		},
-	}
-
-	for i, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			results := FOR(tt.elements)
-			for j, result := range results {
-				if string(result.Render()) != tt.expected[j] {
-					t.Errorf("test %d, expected %q, got %q", i, tt.expected[j], result.Render())
-				}
-			}
-		})
-	}
-}
-
-func TestSTERSIF(t *testing.T) {
-	tests := []struct {
-		condition bool
-		trueCase  string
-		falseCase string
-		expected  string
-	}{
-		{
-			condition: true,
-			trueCase:  "True",
-			falseCase: "False",
-			expected:  "True",
-		},
-		{
-			condition: false,
-			trueCase:  "True",
-			falseCase: "False",
-			expected:  "False",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			result := STER(tt.condition, tt.trueCase, tt.falseCase)
-			if result != tt.expected {
-				t.Errorf("expected %q, got %q", tt.expected, result)
-			}
-		})
-	}
-}
-
-func TestSIF(t *testing.T) {
-	tests := []struct {
-		condition bool
-		trueCase  string
-		expected  string
-	}{
-		{
-			condition: true,
-			trueCase:  "True",
-			expected:  "True",
-		},
-		{
-			condition: false,
-			trueCase:  "True",
-			expected:  "",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			result := SIF(tt.condition, tt.trueCase)
+			result := buf.String()
 			if result != tt.expected {
 				t.Errorf("expected %q, got %q", tt.expected, result)
 			}

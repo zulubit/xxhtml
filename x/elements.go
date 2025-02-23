@@ -229,7 +229,7 @@ func Base(children ...Elem) Elem {
 
 // DOCTYPE generates the raw <!DOCTYPE html> declaration.
 func DOCTYPE() Elem {
-	return ERAW("<!DOCTYPE html>")
+	return CR("<!DOCTYPE html>")
 }
 
 // Html creates a new <html> element with optional children.

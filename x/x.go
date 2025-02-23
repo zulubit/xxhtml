@@ -1,155 +1,144 @@
 package x
 
 import (
-	"bytes"
 	"fmt"
 	"html"
+	"io"
+)
+
+// NodeType represents the type of an HTML node.
+type NodeType int
+
+const (
+	TagNode       NodeType = iota // Represents an HTML tag
+	AttributeNode                 // Represents an HTML attribute
+	ContentNode                   // Represents text content
 )
 
 // Elem represents an HTML element with attributes, text, and children.
-// eltype: 1 = tag, 2 = class, 3 = attribute, 4 = content
 type Elem struct {
-	children *[]Elem
-	key      *string
-	value    *string
-	eltype   int
-	sc       bool // Indicates if the element is self-closing
+	Type       NodeType // Type of the node (TagNode, ClassNode, etc.)
+	Tag        string   // Tag name (for TagNode)
+	AttrKey    string   // Attribute key (for AttributeNode)
+	AttrVal    string   // Attribute value (for AttributeNode/ClassNode)
+	Content    string   // Text content (for ContentNode)
+	Children   []Elem   // Child nodes
+	SelfCloses bool     // Indicates if the element is self-closing
 }
 
-type El []byte
-
-// Render generates the HTML representation of the element and its children as a byte slice.
-func (e Elem) Render() []byte {
-	return e.resolve()
+// Render writes the HTML representation of the element and its children to an io.Writer.
+func (e Elem) Render(w io.Writer) error {
+	return e.render(w)
 }
 
-// resolve constructs the HTML string for the element and recursively for its children.
-func (e Elem) resolve() El {
-	var buf bytes.Buffer
-
-	switch e.eltype {
-	case 1: // Tag element
-		if e.value == nil || *e.value == "" {
-			// If the tag name is empty, render only children if they exist.
-			if e.children != nil {
-				for _, c := range *e.children {
-					buf.Write(c.resolve())
-				}
-			}
-			return buf.Bytes()
+func (e Elem) render(w io.Writer) error {
+	switch e.Type {
+	case TagNode:
+		// Write opening tag
+		if _, err := w.Write([]byte("<" + e.Tag)); err != nil {
+			return err
 		}
 
-		buf.WriteString("<")
-		buf.WriteString(*e.value)
-
-		if e.children != nil {
-			for _, c := range *e.children {
-				if c.eltype == 2 || c.eltype == 3 { // Class or Attribute
-					buf.WriteString(" ")
-					buf.Write(c.resolve())
+		// Render attributes
+		firstNonAttrIndex := len(e.Children)
+		for i, child := range e.Children {
+			if child.Type == AttributeNode {
+				if err := child.render(w); err != nil {
+					return err
 				}
+			} else {
+				firstNonAttrIndex = i
+				break
 			}
 		}
 
-		if e.sc { // Self-closing tag
-			buf.WriteString(" />")
-			return buf.Bytes()
+		// Handle self-closing tags
+		if e.SelfCloses && firstNonAttrIndex == len(e.Children) {
+			if _, err := w.Write([]byte(" />")); err != nil {
+				return err
+			}
+			return nil
 		}
 
-		buf.WriteString(">")
+		if _, err := w.Write([]byte(">")); err != nil {
+			return err
+		}
 
-		if e.children != nil {
-			for _, c := range *e.children {
-				if c.eltype == 4 { // Content
-					buf.Write(c.resolve())
-				} else if c.eltype != 2 && c.eltype != 3 { // Other children elements
-					buf.Write(c.resolve())
+		// Render non-attribute children
+		for i := firstNonAttrIndex; i < len(e.Children); i++ {
+			child := e.Children[i]
+			if child.Type == ContentNode || child.Type == TagNode {
+				if err := child.render(w); err != nil {
+					return err
 				}
 			}
 		}
 
-		buf.WriteString("</" + *e.value + ">")
+		// Write closing tag
+		if _, err := w.Write([]byte("</" + e.Tag + ">")); err != nil {
+			return err
+		}
 
-	case 2: // Class element
-		buf.WriteString(`class="`)
-		buf.WriteString(*e.value)
-		buf.WriteString(`"`)
+	case AttributeNode:
+		attrStr := " " + e.AttrKey
+		if e.AttrVal != "" {
+			attrStr += fmt.Sprintf(`="%s"`, html.EscapeString(e.AttrVal))
+		}
+		if _, err := w.Write([]byte(attrStr)); err != nil {
+			return err
+		}
 
-	case 3: // Attribute element
-		buf.WriteString(*e.key)
-		buf.WriteString(`="`)
-		buf.WriteString(*e.value)
-		buf.WriteString(`"`)
-
-	case 4: // Content element
-		buf.WriteString(*e.value)
+	case ContentNode:
+		if _, err := w.Write([]byte(html.EscapeString(e.Content))); err != nil {
+			return err
+		}
 
 	default:
-		// Handle any unexpected types if necessary
+		return fmt.Errorf("unknown node type: %d", e.Type)
 	}
-
-	return buf.Bytes()
+	return nil
 }
 
-// E initializes a new Elem with the specified tag name, attributes, and optional children.
-func E(name string, children ...Elem) Elem {
-	var nam *string
-	nam = &name
-	var childrenPtr *[]Elem
-	if len(children) > 0 {
-		childrenPtr = &children
+// E initializes a new Elem with the specified tag name and optional children.
+func E(tag string, children ...Elem) Elem {
+	return Elem{
+		Type:     TagNode,
+		Tag:      tag,
+		Children: children,
 	}
-	return Elem{value: nam, children: childrenPtr, eltype: 1}
-}
-
-// Class creates an Elem representing a CSS class.
-func Class(classes string) Elem {
-	var class *string
-	class = &classes
-	return Elem{eltype: 2, value: class}
 }
 
 // Att creates an Elem representing an HTML attribute with a key-value pair.
-func Att(key string, value string) Elem {
-	var att *string
-	var k *string
-	att = &value
-	k = &key
-	return Elem{eltype: 3, value: att, key: k}
-}
-
-// SelfClose marks an element as self-closing.
-func (e Elem) SelfClose() Elem {
-	if e.eltype == 1 {
-		e.sc = true
+func Att(key, value string) Elem {
+	return Elem{
+		Type:    AttributeNode,
+		AttrKey: key,
+		AttrVal: value,
 	}
-	return e
-}
-
-// ERAW creates an Elem with raw HTML content or plain text.
-func ERAW(value string) Elem {
-	val := value
-	return Elem{value: &val, eltype: 4}
 }
 
 // C creates an Elem with escaped HTML content or plain text.
 func C(value interface{}) Elem {
-	switch v := value.(type) {
-	case string:
-		return ERAW(html.EscapeString(v))
-	default:
-		return ERAW(html.EscapeString(fmt.Sprintf("%v", value)))
+	content := fmt.Sprintf("%v", value)
+	return Elem{
+		Type:    ContentNode,
+		Content: html.EscapeString(content),
 	}
 }
 
 // CR creates an Elem with unescaped HTML content or plain text.
 func CR(value interface{}) Elem {
-	switch v := value.(type) {
-	case string:
-		return ERAW(v)
-	default:
-		return ERAW(fmt.Sprintf("%v", value))
+	content := fmt.Sprintf("%v", value)
+	return Elem{
+		Type:    ContentNode,
+		Content: content,
 	}
+}
+
+// SelfClose marks an element as self-closing.
+func (e Elem) SelfClose() Elem {
+	e.SelfCloses = true
+	return e
 }
 
 // IF returns trueCase if the condition is true, otherwise returns an empty Elem.
@@ -157,12 +146,7 @@ func IF(condition bool, trueCase Elem) Elem {
 	if condition {
 		return trueCase
 	}
-	return Elem{}
-}
-
-// FOR takes a slice of Elem and returns all elements in the slice.
-func FOR(iterClosure []Elem) []Elem {
-	return iterClosure
+	return Elem{Type: ContentNode}
 }
 
 // TER returns trueCase if the condition is true, otherwise returns falseCase.
